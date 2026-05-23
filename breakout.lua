@@ -1,18 +1,23 @@
 
 function _init()
-    tile_width = 8
-    tile_height = 8
+    tile_size = 8
     grid_size = 16
     pos_x = 8
     pos_y = 8
     player = 1
-    paddle_x = 64
-    paddle_y = tile_height * (grid_size - 2)
+    paddle_bot_x = tile_size*(grid_size*0.5)
+    paddle_top_x = (tile_size*((grid_size*0.5)-1))
+    paddle_left_x = 0
+    paddle_right_x = tile_size * (grid_size - 1)
+    paddle_bot_y = tile_size * (grid_size - 1)
+    paddle_top_y = 0
+    paddle_left_y = tile_size*(grid_size*0.5)
+    paddle_right_y = (tile_size*((grid_size*0.5)-1))
 end
 
 function _update()
     get_button_held()
-    move_paddle()
+    move_paddles()
 end
 
 
@@ -28,29 +33,39 @@ function get_button_held()
     new_y = 0
     if btn(1) then 
         new_x  = 1 
+        new_y  = 1 
         player = 1 
     end
     if btn(0) then 
         new_x  = -1 
+        new_y  = -1
         player = 2 
     end
     if btn(2) then new_y = -1 end
     if btn(3) then new_y =  1 end
 end
 
-function move_paddle()
-    local min_x = 0
-    local max_x = tile_width * (grid_size - 1)
-    paddle_x += new_x
-    paddle_y += new_y
-    paddle_x = mid(min_x, paddle_x, max_x)
+function move_paddles()
+    local min_pos = 0
+    local max_pos = tile_size * (grid_size - 1)
+    paddle_bot_x += new_x
+    paddle_top_x -= new_x
+    paddle_left_y += new_y
+    paddle_right_y -= new_y
+    paddle_bot_x = mid(min_pos, paddle_bot_x, max_pos)
+    paddle_top_x = mid(min_pos, paddle_top_x, max_pos)
+    paddle_left_y = mid(min_pos, paddle_left_y, max_pos)
+    paddle_right_y = mid(min_pos, paddle_right_y, max_pos)
 end
 
 function _draw()
     cls(0)
     map(0)
     spr(player, pos_x*8, pos_y*8)
-    spr(8, paddle_x, paddle_y)
+    spr(8, paddle_bot_x, paddle_bot_y)
+    spr(9, paddle_top_x, paddle_top_y)
+    spr(10, paddle_left_x, paddle_left_y)
+    spr(11, paddle_right_x, paddle_right_y)
     pset(127,127,12)
     pset(0,127,12)
 end
