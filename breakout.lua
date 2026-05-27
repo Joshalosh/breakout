@@ -26,7 +26,6 @@ function load_level(data)
                     type = block_type, 
                     alive = true
                 }
-
                 add(active_blocks, new_block)
             end
         end
@@ -114,6 +113,8 @@ function _draw()
             spr(sprite_id, block.x, block.y)
         end
     end
+    spr(14, paddle_bot_x, paddle_bot_y-8)
+    --pset(paddle_bot_x+4, paddle_bot_y-8, 7)
     pset(127,127,12)
     pset(0,127,12)
 end
