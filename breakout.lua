@@ -1,14 +1,4 @@
 
-level_data = {
-    {1, 1, 1, 1, 1, 1, 1},
-    {1, 1, 1, 1, 1, 1, 1},
-    {0, 2, 0, 2, 0, 2, 0},
-    {1, 1, 1, 1, 1, 1, 1},
-    {1, 1, 1, 1, 1, 1, 1}
-}
-
-active_blocks = {}
-
 function load_level(data)
     local start_x      = 36
     local start_y      = 48
@@ -45,12 +35,32 @@ function _init()
     paddle_left_y  = tile_size*(grid_size*0.5)
     paddle_right_x = tile_size * (grid_size - 1)
     paddle_right_y = (tile_size*((grid_size*0.5)-1))
+
+    ball = {
+        position = { x = paddle_bot_x, y = paddle_bot_y - 8 },
+        is_launched = false,
+        last_wall_hit = { bottom = true, top = false, right = false, left = false },
+        speed = 1.0,
+    }
+    --srand(4)
+
+    active_blocks = {}
+
+    level_data = {
+        {1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1},
+        {0, 2, 0, 2, 0, 2, 0},
+        {1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1}
+    }
+
     load_level(level_data)
 end
 
 function _update()
     get_button_held()
     move_paddles()
+    move_ball()
 end
 
 
@@ -74,6 +84,28 @@ function get_button_held()
     end
     if btn(2) then new_y = -1 end
     if btn(3) then new_y =  1 end
+    if btnp(4) or btnp(5) then 
+        ball.is_launched = true 
+        ball_dir_x = rnd(2) - 1
+        ball_dir_y = rnd(0.0, 1.0)
+    end
+end
+
+function move_ball() 
+    if ball.is_launched then
+        ball.position.x += ball_dir_x
+        if ball.last_wall_hit.bottom then ball.position.y -= ball.speed
+        elseif ball.last_wall_hit.top then ball.position.y += ball.speed
+        end
+    end
+    if ball.position.y <= 0 then 
+        ball.last_wall_hit.bottom = false
+        ball.last_wall_hit.top = true
+    elseif ball.position.y >= 120 then
+        ball.last_wall_hit.bottom = true
+        ball.last_wall_hit.top = false
+    end
+    ball.position.y = mid(0, ball.position.y, 120)
 end
 
 function move_paddles()
@@ -113,7 +145,7 @@ function _draw()
             spr(sprite_id, block.x, block.y)
         end
     end
-    spr(14, paddle_bot_x, paddle_bot_y-8)
+    spr(14, ball.position.x, ball.position.y)
     --pset(paddle_bot_x+4, paddle_bot_y-8, 7)
     pset(127,127,12)
     pset(0,127,12)
