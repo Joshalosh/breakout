@@ -42,6 +42,8 @@ function _init()
         last_wall_hit = { bottom = true, top = false, right = false, left = false },
         speed = 1.0,
     }
+
+    sprite_pos = {x = 8*8, y = 8*8}
     --srand(4)
 
     active_blocks = {}
@@ -74,6 +76,7 @@ function get_button_held()
     -- 5 = x (X button)
     new_x = 0
     new_y = 0
+
     if btn(1) then 
         new_x  = 1 
         new_y  = 1 
@@ -82,8 +85,12 @@ function get_button_held()
         new_x  = -1 
         new_y  = -1
     end
-    if btn(2) then new_y = -1 end
-    if btn(3) then new_y =  1 end
+    if btn(2) then 
+        new_y = -1 
+    end
+    if btn(3) then 
+        new_y =  1 
+    end
     if btnp(4) or btnp(5) then 
         ball.is_launched = true 
         ball_dir_x = rnd(2) - 1
@@ -123,6 +130,11 @@ function move_paddles()
     paddle_right_y  = mid(min_pos, paddle_right_y, max_pos)
 end
 
+function move_sprite()
+    sprite_pos.x += d_x
+    sprite_pos.y += d_y
+end
+
 function _draw()
     cls(0)
     --map(0)
@@ -146,6 +158,7 @@ function _draw()
         end
     end
     spr(14, ball.position.x, ball.position.y)
+    spr(14, sprite_pos.x, sprite_pos.y)
     --pset(paddle_bot_x+4, paddle_bot_y-8, 7)
     pset(127,127,12)
     pset(0,127,12)
