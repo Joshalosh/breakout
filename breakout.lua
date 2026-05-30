@@ -94,7 +94,6 @@ function get_button_held()
     if btnp(4) or btnp(5) then 
         ball.is_launched = true 
         ball_dir_x = rnd(2) - 1
-        ball_dir_y = rnd(0.0, 1.0)
     end
 end
 
