@@ -39,7 +39,6 @@ function _init()
     ball = {
         position = { x = paddle_bot_x, y = paddle_bot_y - 8 },
         is_launched = false,
-        last_wall_hit = { up_down = false, left_right = false},
         speed = 2.0,
     }
     
