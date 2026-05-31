@@ -39,9 +39,11 @@ function _init()
     ball = {
         position = { x = paddle_bot_x, y = paddle_bot_y - 8 },
         is_launched = false,
-        last_wall_hit = { bottom = true, top = false, right = false, left = false },
-        speed = 1.0,
+        last_wall_hit = { up_down = false, left_right = false},
+        speed = 2.0,
     }
+    
+    ball_dir_y = -ball.speed
 
     sprite_pos = {x = 8*8, y = 8*8}
     --srand(4)
@@ -100,18 +102,17 @@ end
 function move_ball() 
     if ball.is_launched then
         ball.position.x += ball_dir_x
-        if ball.last_wall_hit.bottom then ball.position.y -= ball.speed
-        elseif ball.last_wall_hit.top then ball.position.y += ball.speed
+        ball.position.y += ball_dir_y
+
+        if ball.position.y <= 0 or ball.position.y >= 120 then 
+           ball_dir_y = -ball_dir_y
         end
+        if ball.position.x <= 0 or ball.position.x >= 120 then 
+            ball_dir_x = -ball_dir_x
+        end
+
+        ball.position.y = mid(0, ball.position.y, 120)
     end
-    if ball.position.y <= 0 then 
-        ball.last_wall_hit.bottom = false
-        ball.last_wall_hit.top = true
-    elseif ball.position.y >= 120 then
-        ball.last_wall_hit.bottom = true
-        ball.last_wall_hit.top = false
-    end
-    ball.position.y = mid(0, ball.position.y, 120)
 end
 
 function move_paddles()
