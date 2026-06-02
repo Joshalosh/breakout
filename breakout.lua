@@ -11,8 +11,10 @@ function load_level(data)
 
             if block_type > 0 then 
                 local new_block = {
-                    x = start_x + (col - 1) * block_width,
-                    y = start_y + (row - 1) * block_height, 
+                    min_x = start_x + (col - 1) * block_width,
+                    max_x = (start_x + (col - 1) * block_width) + block_width,
+                    min_y = start_y + (row - 1) * block_height, 
+                    max_y = (start_y + (row - 1) * block_height) + block_height, 
                     type = block_type, 
                     alive = true
                 }
@@ -99,18 +101,37 @@ function get_button_held()
 end
 
 function move_ball() 
+        local y_offset = 6
+        local x_offset = 3
+        ball_actual_pos = { x = ball.position.x + x_offset, y = ball.position.y + y_offset }
     if ball.is_launched then
         ball.position.x += ball_dir_x
         ball.position.y += ball_dir_y
 
-        if ball.position.y <= 0 or ball.position.y >= 120 then 
+        ball_actual_pos.x = ball.position.x + 3
+        ball_actual_pos.y = ball.position.y + 6
+
+        if ball_actual_pos.y <= 0 or ball_actual_pos.y >= 128 then 
            ball_dir_y = -ball_dir_y
         end
-        if ball.position.x <= 0 or ball.position.x >= 120 then 
+        if ball_actual_pos.x <= 0 or ball_actual_pos.x >= 120 then 
             ball_dir_x = -ball_dir_x
         end
 
-        ball.position.y = mid(0, ball.position.y, 120)
+        for block in all(active_blocks) do
+            if block.alive then
+                if ball_actual_pos.y <= block.max_y and
+                   ball_actual_pos.y >= block.min_y and
+                   ball_actual_pos.x >= block.min_x and 
+                   ball_actual_pos.x <= block.max_x then
+                        ball_dir_y = -ball_dir_y
+                        block.alive = false
+                end
+            end
+        end
+
+        ball.position.y = mid(0 - y_offset, ball.position.y, 128 + y_offset)
+        ball.position.x = mid(0 - x_offset, ball.position.x, 128 + x_offset)
     end
 end
 
@@ -153,7 +174,7 @@ function _draw()
             if block.type == 1 then sprite_id = 13 end
             if block.type == 2 then sprite_id = 15 end
 
-            spr(sprite_id, block.x, block.y)
+            spr(sprite_id, block.min_x, block.min_y)
         end
     end
     spr(14, ball.position.x, ball.position.y)
@@ -161,4 +182,6 @@ function _draw()
     --pset(paddle_bot_x+4, paddle_bot_y-8, 7)
     pset(127,127,12)
     pset(0,127,12)
+    pset(ball.position.x, ball.position.y, 12)
+    pset(ball_actual_pos.x, ball_actual_pos.y, 3)
 end
