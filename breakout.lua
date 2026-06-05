@@ -38,14 +38,20 @@ function _init()
     paddle_right_x = tile_size * (grid_size - 1)
     paddle_right_y = (tile_size*((grid_size*0.5)-1))
 
+    local x_offset = 3
+    local y_offset = 6
+    local ball_sprite_pos = {x = paddle_bot_x, y = paddle_bot_y - 8}
+    local ball_speed = 2.0
     ball = {
-        position = { x = paddle_bot_x, y = paddle_bot_y - 8 },
+        sprite_position = { x = paddle_bot_x, y = paddle_bot_y - 8 },
+        y_offset = y_offset,
+        x_offset = x_offset,
+        real_position = { x = ball_sprite_pos.x + x_offset, y = ball_sprite_pos.y + y_offset },
         is_launched = false,
-        speed = 2.0,
+        speed = ball_speed,
+        direction = {x = 0, y = -ball_speed},
     }
     
-    ball_dir_y = -ball.speed
-
     sprite_pos = {x = 8*8, y = 8*8}
     --srand(4)
 
@@ -96,44 +102,51 @@ function get_button_held()
     end
     if btnp(4) or btnp(5) then 
         ball.is_launched = true 
-        ball_dir_x = rnd(2) - 1
+        ball.direction.x = rnd(2) - 1
     end
 end
 
 function move_ball() 
-        local y_offset = 6
-        local x_offset = 3
-        ball_actual_pos = { x = ball.position.x + x_offset, y = ball.position.y + y_offset }
     if ball.is_launched then
-        ball.position.x += ball_dir_x
-        ball.position.y += ball_dir_y
+        ball.sprite_position.x += ball.direction.x
+        ball.sprite_position.y += ball.direction.y
 
-        ball_actual_pos.x = ball.position.x + 3
-        ball_actual_pos.y = ball.position.y + 6
+        ball.real_position.x = ball.sprite_position.x + ball.x_offset
+        ball.real_position.y = ball.sprite_position.y + ball.y_offset
 
-        if ball_actual_pos.y <= 0 or ball_actual_pos.y >= 128 then 
-           ball_dir_y = -ball_dir_y
+        if ball.real_position.y <= 0 or ball.real_position.y >= 128 then 
+           ball.direction.y = -ball.direction.y
         end
-        if ball_actual_pos.x <= 0 or ball_actual_pos.x >= 120 then 
-            ball_dir_x = -ball_dir_x
+        if ball.real_position.x <= 0 or ball.real_position.x >= 120 then 
+            ball.direction.x = -ball.direction.x
         end
 
         for block in all(active_blocks) do
             if block.alive then
-                if ball_actual_pos.y <= block.max_y and
-                   ball_actual_pos.y >= block.min_y and
-                   ball_actual_pos.x >= block.min_x and 
-                   ball_actual_pos.x <= block.max_x then
-                        ball_dir_y = -ball_dir_y
+                if ball.real_position.y <= block.max_y and
+                   ball.real_position.y >= block.min_y and
+                   ball.real_position.x >= block.min_x and 
+                   ball.real_position.x <= block.max_x then
+                        ball.direction.y = -ball.direction.y
                         block.alive = false
+                        break
                 end
             end
         end
 
-        ball.position.y = mid(0 - y_offset, ball.position.y, 128 + y_offset)
-        ball.position.x = mid(0 - x_offset, ball.position.x, 128 + x_offset)
+        ball.sprite_position.y = mid(0 - ball.y_offset, ball.sprite_position.y, 128 + ball.y_offset)
+        ball.sprite_position.x = mid(0 - ball.x_offset, ball.sprite_position.x, 128 + ball.x_offset)
     end
 end
+
+
+--[[
+function collide_with_paddles()
+    if ball.is_launched then
+        if ball.real_position.y
+    end
+end
+]]
 
 function move_paddles()
     local min_pos  = 0
@@ -177,11 +190,11 @@ function _draw()
             spr(sprite_id, block.min_x, block.min_y)
         end
     end
-    spr(14, ball.position.x, ball.position.y)
+    spr(14, ball.sprite_position.x, ball.sprite_position.y)
     spr(14, sprite_pos.x, sprite_pos.y)
     --pset(paddle_bot_x+4, paddle_bot_y-8, 7)
     pset(127,127,12)
     pset(0,127,12)
-    pset(ball.position.x, ball.position.y, 12)
-    pset(ball_actual_pos.x, ball_actual_pos.y, 3)
+    pset(ball.sprite_position.x, ball.sprite_position.y, 12)
+    pset(ball.real_position.x, ball.real_position.y, 3)
 end
