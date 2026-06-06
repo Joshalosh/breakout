@@ -29,24 +29,39 @@ function _init()
     grid_size      = 16
     pos_x          = 8
     pos_y          = 8
-    paddle_bot_x   = tile_size*(grid_size*0.5)
-    paddle_bot_y   = tile_size * (grid_size - 1)
-    paddle_top_x   = (tile_size*((grid_size*0.5)-1))
-    paddle_top_y   = 0
-    paddle_left_x  = 0
-    paddle_left_y  = tile_size*(grid_size*0.5)
-    paddle_right_x = tile_size * (grid_size - 1)
-    paddle_right_y = (tile_size*((grid_size*0.5)-1))
+
+    paddle_bot = {
+        sprite_position = {x = tile_size*(grid_size*0.5), y = tile_size * (grid_size - 1)},
+        width           = 8,
+        height          = 2,
+    }
+    paddle_top = {
+        sprite_position = {x = (tile_size*((grid_size*0.5)-1)), y = 0 },
+        width           = 8,
+        height          = 2,
+        y_offset        = 6,
+    }
+    paddle_left = {
+        sprite_position = {x = 0, y = tile_size*(grid_size*0.5)},
+        width    = 2,
+        height   = 8, 
+        x_offset = 6,
+    }
+    paddle_right = {
+        sprite_position = {x = tile_size * (grid_size - 1), y = (tile_size*((grid_size*0.5)-1))},
+        width           = 2,
+        height          = 8,
+    }
 
     local x_offset = 3
     local y_offset = 6
-    local ball_sprite_pos = {x = paddle_bot_x, y = paddle_bot_y - 8}
+    local ball_sprite_pos = {x = paddle_bot.sprite_position.x, y = paddle_bot.sprite_position.y - 8}
     local ball_speed = 2.0
     ball = {
-        sprite_position = { x = paddle_bot_x, y = paddle_bot_y - 8 },
+        sprite_position = {x = ball_sprite_pos.x, y = ball_sprite_pos.y},
         y_offset = y_offset,
         x_offset = x_offset,
-        real_position = { x = ball_sprite_pos.x + x_offset, y = ball_sprite_pos.y + y_offset },
+        real_position = {x = ball_sprite_pos.x + x_offset, y = ball_sprite_pos.y + y_offset},
         is_launched = false,
         speed = ball_speed,
         direction = {x = 0, y = -ball_speed},
@@ -72,6 +87,7 @@ function _update()
     get_button_held()
     move_paddles()
     move_ball()
+    collide_with_paddles()
 end
 
 
@@ -140,27 +156,30 @@ function move_ball()
 end
 
 
---[[
 function collide_with_paddles()
     if ball.is_launched then
-        if ball.real_position.y
+        if ball.real_position.y >= paddle_bot.sprite_position.y and
+           ball.real_position.y <= paddle_bot.sprite_position.y + paddle_bot.height and 
+           ball.real_position.x >= paddle_bot.sprite_position.x and 
+           ball.real_position.x <= paddle_bot.sprite_position.x + paddle_bot.width then
+               ball.direction.y = -ball.direction.y
+       end
     end
 end
-]]
 
 function move_paddles()
     local min_pos  = 0
     local max_pos  = tile_size * (grid_size - 1)
     local velocity = 2
 
-    paddle_bot_x   += (new_x * velocity)
-    paddle_top_x   -= (new_x * velocity)
-    paddle_left_y  += (new_y * velocity)
-    paddle_right_y -= (new_y * velocity)
-    paddle_bot_x    = mid(min_pos, paddle_bot_x, max_pos)
-    paddle_top_x    = mid(min_pos, paddle_top_x, max_pos)
-    paddle_left_y   = mid(min_pos, paddle_left_y, max_pos)
-    paddle_right_y  = mid(min_pos, paddle_right_y, max_pos)
+    paddle_bot.sprite_position.x   += (new_x * velocity)
+    paddle_top.sprite_position.x   -= (new_x * velocity)
+    paddle_left.sprite_position.y  += (new_y * velocity)
+    paddle_right.sprite_position.y -= (new_y * velocity)
+    paddle_bot.sprite_position.x    = mid(min_pos, paddle_bot.sprite_position.x, max_pos)
+    paddle_top.sprite_position.x    = mid(min_pos, paddle_top.sprite_position.x, max_pos)
+    paddle_left.sprite_position.y   = mid(min_pos, paddle_left.sprite_position.y, max_pos)
+    paddle_right.sprite_position.y  = mid(min_pos, paddle_right.sprite_position.y, max_pos)
 end
 
 function move_sprite()
@@ -171,10 +190,10 @@ end
 function _draw()
     cls(0)
     --map(0)
-    spr(8, paddle_bot_x, paddle_bot_y)
-    spr(9, paddle_top_x, paddle_top_y)
-    spr(10, paddle_left_x, paddle_left_y)
-    spr(11, paddle_right_x, paddle_right_y)
+    spr(8, paddle_bot.sprite_position.x,    paddle_bot.sprite_position.y)
+    spr(9, paddle_top.sprite_position.x,    paddle_top.sprite_position.y)
+    spr(10, paddle_left.sprite_position.x,  paddle_left.sprite_position.y)
+    spr(11, paddle_right.sprite_position.x, paddle_right.sprite_position.y)
     --[[
     spr(13, pos_x*8, pos_y*8)
     spr(13, pos_x*8+8, pos_y*8)
