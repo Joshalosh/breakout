@@ -133,7 +133,7 @@ function move_ball()
         if ball.real_position.y <= 0 or ball.real_position.y >= 128 then 
            ball.direction.y = -ball.direction.y
         end
-        if ball.real_position.x <= 0 or ball.real_position.x >= 120 then 
+        if ball.real_position.x <= 0 or ball.real_position.x >= 128 then 
             ball.direction.x = -ball.direction.x
         end
 
@@ -163,7 +163,28 @@ function collide_with_paddles()
            ball.real_position.x >= paddle_bot.sprite_position.x and 
            ball.real_position.x <= paddle_bot.sprite_position.x + paddle_bot.width then
                ball.direction.y = -ball.direction.y
-       end
+        end
+
+        if ball.real_position.y >= paddle_top.sprite_position.y + paddle_top.y_offset and
+           ball.real_position.y <= paddle_top.sprite_position.y + paddle_top.y_offset + paddle_top.height and 
+           ball.real_position.x >= paddle_top.sprite_position.x and 
+           ball.real_position.x <= paddle_top.sprite_position.x + paddle_top.width then
+               ball.direction.y = -ball.direction.y
+        end
+
+        if ball.real_position.y >= paddle_right.sprite_position.y and
+           ball.real_position.y <= paddle_right.sprite_position.y + paddle_right.height and 
+           ball.real_position.x >= paddle_right.sprite_position.x and 
+           ball.real_position.x <= paddle_right.sprite_position.x + paddle_right.width then
+               ball.direction.x = -ball.direction.x
+        end
+
+        if ball.real_position.y >= paddle_left.sprite_position.y and 
+           ball.real_position.y <= paddle_left.sprite_position.y + paddle_left.height and 
+           ball.real_position.x >= paddle_left.sprite_position.x + paddle_left.x_offset and 
+           ball.real_position.x <= paddle_left.sprite_position.x + paddle_left.x_offset + paddle_left.width then
+               ball.direction.x = -ball.direction.x
+        end
     end
 end
 
