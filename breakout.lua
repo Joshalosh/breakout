@@ -31,9 +31,10 @@ function _init()
     pos_y          = 8
 
     paddle_bot = {
-        sprite_position = {x = tile_size*(grid_size*0.5), y = tile_size * (grid_size - 1)},
-        width           = 8,
-        height          = 2,
+        sprite_position    = {x = tile_size*(grid_size*0.5), y = tile_size * (grid_size - 1)},
+        width              = 8,
+        height             = 2,
+        collision_segments = {},
     }
     paddle_top = {
         sprite_position = {x = (tile_size*((grid_size*0.5)-1)), y = 0 },
@@ -162,6 +163,16 @@ function collide_with_paddles()
            ball.real_position.y <= paddle_bot.sprite_position.y + paddle_bot.height and 
            ball.real_position.x >= paddle_bot.sprite_position.x and 
            ball.real_position.x <= paddle_bot.sprite_position.x + paddle_bot.width then
+                
+           dir_x = -1  
+               for segment in all(paddle_bot.collision_segments) do
+                   dir_x += 0.25
+                   if  ball.real_position.x >= segment and 
+                       ball.real_position.x <= segment + 1 then 
+                           ball.direction.x = dir_x
+                           break
+                   end
+               end
                ball.direction.y = -ball.direction.y
         end
 
@@ -201,6 +212,13 @@ function move_paddles()
     paddle_top.sprite_position.x    = mid(min_pos, paddle_top.sprite_position.x, max_pos)
     paddle_left.sprite_position.y   = mid(min_pos, paddle_left.sprite_position.y, max_pos)
     paddle_right.sprite_position.y  = mid(min_pos, paddle_right.sprite_position.y, max_pos)
+
+    -- I've already clamped the paddle position within screen limits
+    -- so no need to safety them again here
+    for index = 0, paddle_bot.width do
+        local segment_position = paddle_bot.sprite_position.x + index
+        paddle_bot.collision_segments[index] = segment_position - 1 
+    end
 end
 
 function move_sprite()
@@ -237,4 +255,8 @@ function _draw()
     pset(0,127,12)
     pset(ball.sprite_position.x, ball.sprite_position.y, 12)
     pset(ball.real_position.x, ball.real_position.y, 3)
+
+    for index in all(paddle_bot.collision_segments) do
+        pset(index, paddle_bot.sprite_position.y, 8)
+    end
 end
