@@ -34,7 +34,6 @@ function _init()
         sprite_position    = {x = tile_size*(grid_size*0.5), y = tile_size * (grid_size - 1)},
         width              = 8,
         height             = 2,
-        collision_segments = {},
     }
     paddle_top = {
         sprite_position = {x = (tile_size*((grid_size*0.5)-1)), y = 0 },
@@ -163,24 +162,29 @@ function collide_with_paddles()
            ball.real_position.y <= paddle_bot.sprite_position.y + paddle_bot.height and 
            ball.real_position.x >= paddle_bot.sprite_position.x and 
            ball.real_position.x <= paddle_bot.sprite_position.x + paddle_bot.width then
-                
-           dir_x = -1  
-               for segment in all(paddle_bot.collision_segments) do
-                   dir_x += 0.25
-                   if  ball.real_position.x >= segment and 
-                       ball.real_position.x <= segment + 1 then 
-                           ball.direction.x = dir_x
-                           break
-                   end
-               end
+               
+               local paddle_half_width = paddle_bot.width * 0.5
+               local ball_distance_from_paddle_mid = ball.real_position.x - 
+                                                     (paddle_bot.sprite_position.x + paddle_half_width)
+               ball.direction.x = (ball_distance_from_paddle_mid / paddle_half_width) * 2.0
+
                ball.direction.y = -ball.direction.y
+               ball.real_position.y -= paddle_bot.sprite_position.y - 1
         end
 
         if ball.real_position.y >= paddle_top.sprite_position.y + paddle_top.y_offset and
            ball.real_position.y <= paddle_top.sprite_position.y + paddle_top.y_offset + paddle_top.height and 
            ball.real_position.x >= paddle_top.sprite_position.x and 
            ball.real_position.x <= paddle_top.sprite_position.x + paddle_top.width then
+
+               local paddle_half_width = paddle_top.width * 0.5
+               local ball_distance_from_paddle_mid = ball.real_position.x - 
+                                                     (paddle_top.sprite_position.x + paddle_half_width)
+               ball.direction.x = (ball_distance_from_paddle_mid / paddle_half_width) * 2.0
+
                ball.direction.y = -ball.direction.y
+               ball.real_position.y -= paddle_top.sprite_position.y + paddle_top.height + 
+                                       paddle_top.y_offset + 1
         end
 
         if ball.real_position.y >= paddle_right.sprite_position.y and
@@ -188,6 +192,7 @@ function collide_with_paddles()
            ball.real_position.x >= paddle_right.sprite_position.x and 
            ball.real_position.x <= paddle_right.sprite_position.x + paddle_right.width then
                ball.direction.x = -ball.direction.x
+               ball.real_position.x = paddle_right.sprite_position.x - 1
         end
 
         if ball.real_position.y >= paddle_left.sprite_position.y and 
@@ -195,6 +200,8 @@ function collide_with_paddles()
            ball.real_position.x >= paddle_left.sprite_position.x + paddle_left.x_offset and 
            ball.real_position.x <= paddle_left.sprite_position.x + paddle_left.x_offset + paddle_left.width then
                ball.direction.x = -ball.direction.x
+               ball.real_position.x = paddle_left.sprite_position.x + paddle_left.width + 
+                                      paddle_left.x_offset + 1
         end
     end
 end
@@ -212,18 +219,6 @@ function move_paddles()
     paddle_top.sprite_position.x    = mid(min_pos, paddle_top.sprite_position.x, max_pos)
     paddle_left.sprite_position.y   = mid(min_pos, paddle_left.sprite_position.y, max_pos)
     paddle_right.sprite_position.y  = mid(min_pos, paddle_right.sprite_position.y, max_pos)
-
-    -- I've already clamped the paddle position within screen limits
-    -- so no need to safety them again here
-    for index = 0, paddle_bot.width do
-        local segment_position = paddle_bot.sprite_position.x + index
-        paddle_bot.collision_segments[index] = segment_position - 1 
-    end
-end
-
-function move_sprite()
-    sprite_pos.x += d_x
-    sprite_pos.y += d_y
 end
 
 function _draw()
@@ -255,8 +250,4 @@ function _draw()
     pset(0,127,12)
     pset(ball.sprite_position.x, ball.sprite_position.y, 12)
     pset(ball.real_position.x, ball.real_position.y, 3)
-
-    for index in all(paddle_bot.collision_segments) do
-        pset(index, paddle_bot.sprite_position.y, 8)
-    end
 end
