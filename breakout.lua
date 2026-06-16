@@ -158,66 +158,74 @@ end
 
 function collide_with_paddles()
     if ball.is_launched then
-        local dir_speed = 3.0
-        if ball.real_position.y >= paddle_bot.sprite_position.y and
-           ball.real_position.y <= paddle_bot.sprite_position.y + paddle_bot.height and 
-           ball.real_position.x >= paddle_bot.sprite_position.x and 
-           ball.real_position.x <= paddle_bot.sprite_position.x + paddle_bot.width then
+        local ball_pos_y = ball.real_position.y 
+        local ball_pos_x = ball.real_position.x 
+        local new_direction_x = ball.direction.x
+        local new_direction_y = ball.direction.y
+
+        if ball_pos_y >= paddle_bot.sprite_position.y and
+           ball_pos_y <= paddle_bot.sprite_position.y + paddle_bot.height and 
+           ball_pos_x >= paddle_bot.sprite_position.x and 
+           ball_pos_x <= paddle_bot.sprite_position.x + paddle_bot.width then
                
                local half_size = paddle_bot.width * 0.5
-               local distance_from_mid = ball.real_position.x - 
-                                                     (paddle_bot.sprite_position.x + half_size)
-               ball.direction.x = (distance_from_mid / half_size) * dir_speed
+               local distance_from_mid = ball_pos_x - (paddle_bot.sprite_position.x + half_size)
+               new_direction_x = (distance_from_mid / half_size)
+               new_direction_y = -new_direction_y
 
-               ball.direction.y = -ball.direction.y
                ball.real_position.y = paddle_bot.sprite_position.y - 1
         end
 
-        if ball.real_position.y >= paddle_top.sprite_position.y + paddle_top.y_offset and
-           ball.real_position.y <= paddle_top.sprite_position.y + paddle_top.y_offset + paddle_top.height and 
-           ball.real_position.x >= paddle_top.sprite_position.x and 
-           ball.real_position.x <= paddle_top.sprite_position.x + paddle_top.width then
+        if ball_pos_y >= paddle_top.sprite_position.y + paddle_top.y_offset and
+           ball_pos_y <= paddle_top.sprite_position.y + paddle_top.y_offset + paddle_top.height and 
+           ball_pos_x >= paddle_top.sprite_position.x and 
+           ball_pos_x <= paddle_top.sprite_position.x + paddle_top.width then
 
                local half_size = paddle_top.width * 0.5
-               local distance_from_mid = ball.real_position.x - 
-                                                     (paddle_top.sprite_position.x + half_size)
-               ball.direction.x = (distance_from_mid / half_size) * dir_speed
+               local distance_from_mid = ball_pos_x - (paddle_top.sprite_position.x + half_size)
+               new_direction_x = (distance_from_mid / half_size)
 
-               ball.direction.y = -ball.direction.y
+               new_direction_y = -new_direction_y
+
                ball.real_position.y = paddle_top.sprite_position.y + paddle_top.height + 
                                        paddle_top.y_offset + 1
         end
 
-        if ball.real_position.y >= paddle_right.sprite_position.y and
-           ball.real_position.y <= paddle_right.sprite_position.y + paddle_right.height and 
-           ball.real_position.x >= paddle_right.sprite_position.x and 
-           ball.real_position.x <= paddle_right.sprite_position.x + paddle_right.width then
+        if ball_pos_y >= paddle_right.sprite_position.y and
+           ball_pos_y <= paddle_right.sprite_position.y + paddle_right.height and 
+           ball_pos_x >= paddle_right.sprite_position.x and 
+           ball_pos_x <= paddle_right.sprite_position.x + paddle_right.width then
 
                local half_size = paddle_right.height * 0.5
-               local distance_from_mid = ball.real_position.y - 
-                                                     (paddle_right.sprite_position.y + half_size)
+               local distance_from_mid = ball_pos_y - (paddle_right.sprite_position.y + half_size)
                local dir_y_normalised = distance_from_mid / half_size
-               ball.direction.y = dir_y_normalised * dir_speed
+               new_direction_y = dir_y_normalised
 
-               ball.direction.x = -ball.direction.x
+               new_direction_x = -new_direction_x
                ball.real_position.x = paddle_right.sprite_position.x - 1
         end
 
-        if ball.real_position.y >= paddle_left.sprite_position.y and 
-           ball.real_position.y <= paddle_left.sprite_position.y + paddle_left.height and 
-           ball.real_position.x >= paddle_left.sprite_position.x + paddle_left.x_offset and 
-           ball.real_position.x <= paddle_left.sprite_position.x + paddle_left.x_offset + paddle_left.width then
+        if ball_pos_y >= paddle_left.sprite_position.y and 
+           ball_pos_y <= paddle_left.sprite_position.y + paddle_left.height and 
+           ball_pos_x >= paddle_left.sprite_position.x + paddle_left.x_offset and 
+           ball_pos_x <= paddle_left.sprite_position.x + paddle_left.x_offset + paddle_left.width then
 
                local half_size = paddle_left.height * 0.5
-               local distance_from_mid = ball.real_position.y - 
-                                                     (paddle_left.sprite_position.y + half_size)
+               local distance_from_mid = ball_pos_y - (paddle_left.sprite_position.y + half_size)
                local dir_y_normalised = distance_from_mid / half_size
-               ball.direction.y = dir_y_normalised * dir_speed
+               new_direction_y = dir_y_normalised
 
-               ball.direction.x = -ball.direction.x
+               new_direction_x = -new_direction_x
                ball.real_position.x = paddle_left.sprite_position.x + paddle_left.width + 
                                       paddle_left.x_offset + 1
         end
+
+        -- TODO: lets wrap this up in a bool to check if it's collided with anything first
+        --
+       local ball_direction_magnitude = sqrt(new_direction_x*new_direction_x + 
+                                             new_direction_y*new_direction_y)
+       ball.direction.x = new_direction_x / ball_direction_magnitude
+       ball.direction.y = new_direction_y / ball_direction_magnitude
     end
 end
 
