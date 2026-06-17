@@ -245,7 +245,7 @@ function move_paddles()
     local velocity = 2
 
     paddle_bot.sprite_position.x   += (new_x * velocity)
-    paddle_top.sprite_position.x   -= (new_x * velocity)
+    paddle_top.sprite_position.x   += (new_x * velocity)
     paddle_left.sprite_position.y  += (new_y * velocity)
     paddle_right.sprite_position.y -= (new_y * velocity)
     paddle_bot.sprite_position.x    = mid(min_pos, paddle_bot.sprite_position.x, max_pos)
