@@ -118,7 +118,10 @@ function get_button_held()
     end
     if btnp(4) or btnp(5) then 
         ball.is_launched = true 
-        ball.direction.x = rnd(2) - 1
+        local new_dir_x = rnd(2) - 1
+        local direction_magnitude = sqrt(new_dir_x*new_dir_x + ball.direction.y * ball.direction.y)
+        ball.direction.x = new_dir_x / direction_magnitude
+        ball.direction.y /= direction_magnitude 
     end
 end
 
@@ -162,6 +165,7 @@ function collide_with_paddles()
         local ball_pos_x = ball.real_position.x 
         local new_direction_x = ball.direction.x
         local new_direction_y = ball.direction.y
+        local has_collided = false
 
         if ball_pos_y >= paddle_bot.sprite_position.y and
            ball_pos_y <= paddle_bot.sprite_position.y + paddle_bot.height and 
@@ -172,6 +176,7 @@ function collide_with_paddles()
                local distance_from_mid = ball_pos_x - (paddle_bot.sprite_position.x + half_size)
                new_direction_x = (distance_from_mid / half_size)
                new_direction_y = -new_direction_y
+               has_collided = true
 
                ball.real_position.y = paddle_bot.sprite_position.y - 1
         end
@@ -186,6 +191,7 @@ function collide_with_paddles()
                new_direction_x = (distance_from_mid / half_size)
 
                new_direction_y = -new_direction_y
+               has_collided = true
 
                ball.real_position.y = paddle_top.sprite_position.y + paddle_top.height + 
                                        paddle_top.y_offset + 1
@@ -202,6 +208,7 @@ function collide_with_paddles()
                new_direction_y = dir_y_normalised
 
                new_direction_x = -new_direction_x
+               has_collided = true
                ball.real_position.x = paddle_right.sprite_position.x - 1
         end
 
@@ -216,16 +223,19 @@ function collide_with_paddles()
                new_direction_y = dir_y_normalised
 
                new_direction_x = -new_direction_x
+               has_collided = true
                ball.real_position.x = paddle_left.sprite_position.x + paddle_left.width + 
                                       paddle_left.x_offset + 1
         end
 
         -- TODO: lets wrap this up in a bool to check if it's collided with anything first
         --
-       local ball_direction_magnitude = sqrt(new_direction_x*new_direction_x + 
-                                             new_direction_y*new_direction_y)
-       ball.direction.x = new_direction_x / ball_direction_magnitude
-       ball.direction.y = new_direction_y / ball_direction_magnitude
+        if has_collided then
+            local ball_direction_magnitude = sqrt(new_direction_x*new_direction_x + 
+                                                  new_direction_y*new_direction_y)
+            ball.direction.x = new_direction_x / ball_direction_magnitude
+            ball.direction.y = new_direction_y / ball_direction_magnitude
+        end
     end
 end
 
