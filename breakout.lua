@@ -31,24 +31,35 @@ function _init()
     pos_y          = 8
 
     paddle_bot = {
-        sprite_position    = {x = tile_size*(grid_size*0.5), y = tile_size * (grid_size - 1)},
+        sprite_position    = {x = tile_size*(grid_size*0.5)-4, y = tile_size * (grid_size - 1)},
         width              = 8,
         height             = 2,
     }
     paddle_top = {
-        sprite_position = {x = (tile_size*((grid_size*0.5)-1)), y = 0 },
+        sprite_position = {x = tile_size*(grid_size*0.5)-4, y = 0 },
         width           = 8,
         height          = 2,
         y_offset        = 6,
     }
-    paddle_left = {
+    paddle_left_bot = {
         sprite_position = {x = 0, y = tile_size*(grid_size*0.5)},
         width    = 2,
         height   = 8, 
         x_offset = 6,
     }
-    paddle_right = {
-        sprite_position = {x = tile_size * (grid_size - 1), y = (tile_size*((grid_size*0.5)-1))},
+    paddle_right_bot = {
+        sprite_position = {x = tile_size * (grid_size - 1), y = tile_size*(grid_size*0.5)},
+        width           = 2,
+        height          = 8,
+    }
+    paddle_left_top = {
+        sprite_position = {x = 0, y = tile_size*(grid_size*0.5)-4},
+        width    = 2,
+        height   = 8, 
+        x_offset = 6,
+    }
+    paddle_right_top = {
+        sprite_position = {x = tile_size * (grid_size - 1), y = tile_size*(grid_size*0.5)-4},
         width           = 2,
         height          = 8,
     }
@@ -197,35 +208,66 @@ function collide_with_paddles()
                                        paddle_top.y_offset + 1
         end
 
-        if ball_pos_y >= paddle_right.sprite_position.y and
-           ball_pos_y <= paddle_right.sprite_position.y + paddle_right.height and 
-           ball_pos_x >= paddle_right.sprite_position.x and 
-           ball_pos_x <= paddle_right.sprite_position.x + paddle_right.width then
+        if ball_pos_y >= paddle_right_bot.sprite_position.y and
+           ball_pos_y <= paddle_right_bot.sprite_position.y + paddle_right_bot.height and 
+           ball_pos_x >= paddle_right_bot.sprite_position.x and 
+           ball_pos_x <= paddle_right_bot.sprite_position.x + paddle_right_bot.width then
 
-               local half_size = paddle_right.height * 0.5
-               local distance_from_mid = ball_pos_y - (paddle_right.sprite_position.y + half_size)
+               local half_size = paddle_right_bot.height * 0.5
+               local distance_from_mid = ball_pos_y - (paddle_right_bot.sprite_position.y + half_size)
                local dir_y_normalised = distance_from_mid / half_size
                new_direction_y = dir_y_normalised
 
                new_direction_x = -new_direction_x
                has_collided = true
-               ball.real_position.x = paddle_right.sprite_position.x - 1
+               ball.real_position.x = paddle_right_bot.sprite_position.x - 1
         end
 
-        if ball_pos_y >= paddle_left.sprite_position.y and 
-           ball_pos_y <= paddle_left.sprite_position.y + paddle_left.height and 
-           ball_pos_x >= paddle_left.sprite_position.x + paddle_left.x_offset and 
-           ball_pos_x <= paddle_left.sprite_position.x + paddle_left.x_offset + paddle_left.width then
+        if ball_pos_y >= paddle_left_bot.sprite_position.y and 
+           ball_pos_y <= paddle_left_bot.sprite_position.y + paddle_left_bot.height and 
+           ball_pos_x >= paddle_left_bot.sprite_position.x + paddle_left_bot.x_offset and 
+           ball_pos_x <= paddle_left_bot.sprite_position.x + paddle_left_bot.x_offset + paddle_left_bot.width then
 
-               local half_size = paddle_left.height * 0.5
-               local distance_from_mid = ball_pos_y - (paddle_left.sprite_position.y + half_size)
+               local half_size = paddle_left_bot.height * 0.5
+               local distance_from_mid = ball_pos_y - (paddle_left_bot.sprite_position.y + half_size)
                local dir_y_normalised = distance_from_mid / half_size
                new_direction_y = dir_y_normalised
 
                new_direction_x = -new_direction_x
                has_collided = true
-               ball.real_position.x = paddle_left.sprite_position.x + paddle_left.width + 
-                                      paddle_left.x_offset + 1
+               ball.real_position.x = paddle_left_bot.sprite_position.x + paddle_left_bot.width + 
+                                      paddle_left_bot.x_offset + 1
+        end
+
+        if ball_pos_y >= paddle_right_top.sprite_position.y and
+           ball_pos_y <= paddle_right_top.sprite_position.y + paddle_right_top.height and 
+           ball_pos_x >= paddle_right_top.sprite_position.x and 
+           ball_pos_x <= paddle_right_top.sprite_position.x + paddle_right_top.width then
+
+               local half_size = paddle_right_top.height * 0.5
+               local distance_from_mid = ball_pos_y - (paddle_right_top.sprite_position.y + half_size)
+               local dir_y_normalised = distance_from_mid / half_size
+               new_direction_y = dir_y_normalised
+
+               new_direction_x = -new_direction_x
+               has_collided = true
+               ball.real_position.x = paddle_right_top.sprite_position.x - 1
+        end
+
+        if ball_pos_y >= paddle_left_top.sprite_position.y and 
+           ball_pos_y <= paddle_left_top.sprite_position.y + paddle_left_top.height and 
+           ball_pos_x >= paddle_left_top.sprite_position.x + paddle_left_top.x_offset and 
+           ball_pos_x <= paddle_left_top.sprite_position.x + paddle_left_top.x_offset + paddle_left_top.width then
+
+               local half_size = paddle_left_top.height * 0.5
+               local distance_from_mid = ball_pos_y - (paddle_left_top.sprite_position.y + half_size)
+               local dir_y_normalised = distance_from_mid / half_size
+               new_direction_y = dir_y_normalised
+
+               new_direction_x = -new_direction_x
+               has_collided = true
+               ball.real_position.x = paddle_left_top.sprite_position.x + paddle_left_top.width + 
+                                      paddle_left_top.x_offset + 1
         end
 
         -- TODO: lets wrap this up in a bool to check if it's collided with anything first
@@ -240,18 +282,23 @@ function collide_with_paddles()
 end
 
 function move_paddles()
-    local min_pos  = 0
-    local max_pos  = tile_size * (grid_size - 1)
-    local velocity = 2
+    local min_pos      = 0
+    local half_pos = tile_size * (grid_size*0.5)
+    local max_pos      = tile_size * (grid_size - 1)
+    local velocity     = 2
 
-    paddle_bot.sprite_position.x   += (new_x * velocity)
-    paddle_top.sprite_position.x   += (new_x * velocity)
-    paddle_left.sprite_position.y  += (new_y * velocity)
-    paddle_right.sprite_position.y -= (new_y * velocity)
-    paddle_bot.sprite_position.x    = mid(min_pos, paddle_bot.sprite_position.x, max_pos)
-    paddle_top.sprite_position.x    = mid(min_pos, paddle_top.sprite_position.x, max_pos)
-    paddle_left.sprite_position.y   = mid(min_pos, paddle_left.sprite_position.y, max_pos)
-    paddle_right.sprite_position.y  = mid(min_pos, paddle_right.sprite_position.y, max_pos)
+    paddle_bot.sprite_position.x       += (new_x * velocity)
+    paddle_top.sprite_position.x       += (new_x * velocity)
+    paddle_left_bot.sprite_position.y  -= (new_y * velocity)
+    paddle_right_bot.sprite_position.y += (new_y * velocity)
+    paddle_left_top.sprite_position.y  += (new_y * velocity)
+    paddle_right_top.sprite_position.y -= (new_y * velocity)
+    paddle_bot.sprite_position.x        = mid(min_pos, paddle_bot.sprite_position.x, max_pos)
+    paddle_top.sprite_position.x        = mid(min_pos, paddle_top.sprite_position.x, max_pos)
+    paddle_left_bot.sprite_position.y       = mid(half_pos, paddle_left_bot.sprite_position.y, max_pos)
+    paddle_right_bot.sprite_position.y      = mid(half_pos, paddle_right_bot.sprite_position.y, max_pos)
+    paddle_left_top.sprite_position.y       = mid(min_pos, paddle_left_top.sprite_position.y, half_pos)
+    paddle_right_top.sprite_position.y      = mid(min_pos, paddle_right_top.sprite_position.y, half_pos)
 end
 
 function _draw()
@@ -259,8 +306,10 @@ function _draw()
     --map(0)
     spr(8, paddle_bot.sprite_position.x,    paddle_bot.sprite_position.y)
     spr(9, paddle_top.sprite_position.x,    paddle_top.sprite_position.y)
-    spr(10, paddle_left.sprite_position.x,  paddle_left.sprite_position.y)
-    spr(11, paddle_right.sprite_position.x, paddle_right.sprite_position.y)
+    spr(10, paddle_left_bot.sprite_position.x,  paddle_left_bot.sprite_position.y)
+    spr(11, paddle_right_bot.sprite_position.x, paddle_right_bot.sprite_position.y)
+    spr(10, paddle_left_top.sprite_position.x,  paddle_left_top.sprite_position.y)
+    spr(11, paddle_right_top.sprite_position.x, paddle_right_top.sprite_position.y)
     --[[
     spr(13, pos_x*8, pos_y*8)
     spr(13, pos_x*8+8, pos_y*8)
