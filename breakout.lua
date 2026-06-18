@@ -42,24 +42,24 @@ function _init()
         y_offset        = 6,
     }
     paddle_left_bot = {
-        sprite_position = {x = 0, y = tile_size*(grid_size*0.5)},
+        sprite_position = {x = 0, y = 90},--tile_size*(grid_size*0.75)},
         width    = 2,
         height   = 8, 
         x_offset = 6,
     }
     paddle_right_bot = {
-        sprite_position = {x = tile_size * (grid_size - 1), y = tile_size*(grid_size*0.5)},
+        sprite_position = {x = tile_size * (grid_size - 1), y = 90},--tile_size*(grid_size*0.75)},
         width           = 2,
         height          = 8,
     }
     paddle_left_top = {
-        sprite_position = {x = 0, y = tile_size*(grid_size*0.5)-4},
+        sprite_position = {x = 0, y = 30},--tile_size*(grid_size*0.25)-8},
         width    = 2,
         height   = 8, 
         x_offset = 6,
     }
     paddle_right_top = {
-        sprite_position = {x = tile_size * (grid_size - 1), y = tile_size*(grid_size*0.5)-4},
+        sprite_position = {x = tile_size * (grid_size - 1), y = 30},--tile_size*(grid_size*0.25)-8},
         width           = 2,
         height          = 8,
     }
@@ -282,23 +282,23 @@ function collide_with_paddles()
 end
 
 function move_paddles()
-    local min_pos      = 0
+    local min_pos      = 8
     local half_pos = tile_size * (grid_size*0.5)
-    local max_pos      = tile_size * (grid_size - 1)
+    local max_pos      = tile_size * (grid_size - 2)
     local velocity     = 2
 
     paddle_bot.sprite_position.x       += (new_x * velocity)
     paddle_top.sprite_position.x       += (new_x * velocity)
-    paddle_left_bot.sprite_position.y  -= (new_y * velocity)
-    paddle_right_bot.sprite_position.y += (new_y * velocity)
-    paddle_left_top.sprite_position.y  += (new_y * velocity)
-    paddle_right_top.sprite_position.y -= (new_y * velocity)
+    paddle_left_bot.sprite_position.y  -= (new_y * velocity*0.5)
+    paddle_right_bot.sprite_position.y += (new_y * velocity*0.5)
+    paddle_left_top.sprite_position.y  += (new_y * velocity*0.5)
+    paddle_right_top.sprite_position.y -= (new_y * velocity*0.5)
     paddle_bot.sprite_position.x        = mid(min_pos, paddle_bot.sprite_position.x, max_pos)
     paddle_top.sprite_position.x        = mid(min_pos, paddle_top.sprite_position.x, max_pos)
     paddle_left_bot.sprite_position.y       = mid(half_pos, paddle_left_bot.sprite_position.y, max_pos)
     paddle_right_bot.sprite_position.y      = mid(half_pos, paddle_right_bot.sprite_position.y, max_pos)
-    paddle_left_top.sprite_position.y       = mid(min_pos, paddle_left_top.sprite_position.y, half_pos)
-    paddle_right_top.sprite_position.y      = mid(min_pos, paddle_right_top.sprite_position.y, half_pos)
+    paddle_left_top.sprite_position.y       = mid(min_pos, paddle_left_top.sprite_position.y, half_pos-8)
+    paddle_right_top.sprite_position.y      = mid(min_pos, paddle_right_top.sprite_position.y, half_pos-8)
 end
 
 function _draw()
