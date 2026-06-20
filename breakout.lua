@@ -72,7 +72,10 @@ function _init()
         sprite_position = {x = ball_sprite_pos.x, y = ball_sprite_pos.y},
         y_offset = y_offset,
         x_offset = x_offset,
-        real_position = {x = ball_sprite_pos.x + x_offset, y = ball_sprite_pos.y + y_offset},
+        real_position = {min_x = ball_sprite_pos.x + x_offset, 
+                         max_x = ball_sprite_pos.x + x_offset + 1,
+                         min_y = ball_sprite_pos.y + y_offset,
+                         max_y = ball_sprite_pos.y + y_offset + 1},
         is_launched = false,
         speed = ball_speed,
         direction = {x = 0, y = -ball_speed},
@@ -141,22 +144,24 @@ function move_ball()
         ball.sprite_position.x += ball.direction.x * ball.speed
         ball.sprite_position.y += ball.direction.y * ball.speed
 
-        ball.real_position.x = ball.sprite_position.x + ball.x_offset
-        ball.real_position.y = ball.sprite_position.y + ball.y_offset
+        ball.real_position.min_x = ball.sprite_position.x + ball.x_offset
+        ball.real_position.max_x = ball.real_position.min_x + 1
+        ball.real_position.min_y = ball.sprite_position.y + ball.y_offset
+        ball.real_position.max_y = ball.real_position.min_y + 1
 
-        if ball.real_position.y <= 0 or ball.real_position.y >= 128 then 
+        if ball.real_position.min_y <= 0 or ball.real_position.max_y >= 128 then 
            ball.direction.y = -ball.direction.y
         end
-        if ball.real_position.x <= 0 or ball.real_position.x >= 128 then 
+        if ball.real_position.min_x <= 0 or ball.real_position.max_x >= 128 then 
             ball.direction.x = -ball.direction.x
         end
 
         for block in all(active_blocks) do
             if block.alive then
-                if ball.real_position.y <= block.max_y and
-                   ball.real_position.y >= block.min_y and
-                   ball.real_position.x >= block.min_x and 
-                   ball.real_position.x <= block.max_x then
+                if (ball.real_position.min_y or ball.real_position.max_y) <= block.max_y and
+                   (ball.real_position.min_y or ball.real_position.max_y) >= block.min_y and
+                   (ball.real_position.min_x or ball.real_position.max_x) >= block.min_x and 
+                   (ball.real_position.min_x or ball.real_position.max_x) <= block.max_x then
                         ball.direction.y = -ball.direction.y
                         block.alive = false
                         break
@@ -172,8 +177,9 @@ end
 
 function collide_with_paddles()
     if ball.is_launched then
-        local ball_pos_y = ball.real_position.y 
-        local ball_pos_x = ball.real_position.x 
+        -- TODO: get AABB collision working with paddles 
+        local ball_pos_y = ball.real_position.min_y 
+        local ball_pos_x = ball.real_position.min_x 
         local new_direction_x = ball.direction.x
         local new_direction_y = ball.direction.y
         local has_collided = false
@@ -189,7 +195,7 @@ function collide_with_paddles()
                new_direction_y = -new_direction_y
                has_collided = true
 
-               ball.real_position.y = paddle_bot.sprite_position.y - 1
+               ball.real_position.max_y = paddle_bot.sprite_position.y - 1
         end
 
         if ball_pos_y >= paddle_top.sprite_position.y + paddle_top.y_offset and
@@ -204,7 +210,7 @@ function collide_with_paddles()
                new_direction_y = -new_direction_y
                has_collided = true
 
-               ball.real_position.y = paddle_top.sprite_position.y + paddle_top.height + 
+               ball.real_position.min_y = paddle_top.sprite_position.y + paddle_top.height + 
                                        paddle_top.y_offset + 1
         end
 
@@ -220,7 +226,7 @@ function collide_with_paddles()
 
                new_direction_x = -new_direction_x
                has_collided = true
-               ball.real_position.x = paddle_right_bot.sprite_position.x - 1
+               ball.real_position.max_x = paddle_right_bot.sprite_position.x - 1
         end
 
         if ball_pos_y >= paddle_left_bot.sprite_position.y and 
@@ -235,7 +241,7 @@ function collide_with_paddles()
 
                new_direction_x = -new_direction_x
                has_collided = true
-               ball.real_position.x = paddle_left_bot.sprite_position.x + paddle_left_bot.width + 
+               ball.real_position.min_x = paddle_left_bot.sprite_position.x + paddle_left_bot.width + 
                                       paddle_left_bot.x_offset + 1
         end
 
@@ -251,7 +257,7 @@ function collide_with_paddles()
 
                new_direction_x = -new_direction_x
                has_collided = true
-               ball.real_position.x = paddle_right_top.sprite_position.x - 1
+               ball.real_position.max_x = paddle_right_top.sprite_position.x - 1
         end
 
         if ball_pos_y >= paddle_left_top.sprite_position.y and 
@@ -266,7 +272,7 @@ function collide_with_paddles()
 
                new_direction_x = -new_direction_x
                has_collided = true
-               ball.real_position.x = paddle_left_top.sprite_position.x + paddle_left_top.width + 
+               ball.real_position.min_x = paddle_left_top.sprite_position.x + paddle_left_top.width + 
                                       paddle_left_top.x_offset + 1
         end
 
@@ -331,5 +337,6 @@ function _draw()
     pset(127,127,12)
     pset(0,127,12)
     pset(ball.sprite_position.x, ball.sprite_position.y, 12)
-    pset(ball.real_position.x, ball.real_position.y, 3)
+    pset(ball.real_position.min_x, ball.real_position.min_y, 3)
+    pset(ball.real_position.max_x, ball.real_position.max_y, 6)
 end
