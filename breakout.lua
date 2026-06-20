@@ -158,12 +158,19 @@ function move_ball()
 
         for block in all(active_blocks) do
             if block.alive then
+                -- TODO: this check needs simplification... THINK!
                 if (ball.real_position.min_y or ball.real_position.max_y) <= block.max_y and
                    (ball.real_position.min_y or ball.real_position.max_y) >= block.min_y and
                    (ball.real_position.min_x or ball.real_position.max_x) >= block.min_x and 
                    (ball.real_position.min_x or ball.real_position.max_x) <= block.max_x then
                         ball.direction.y = -ball.direction.y
                         block.alive = false
+                        if (ball.real_position.max_x >= block.min_x and 
+                            ball.real_position.min_x <= block.min_x) or
+                            (ball.real_position.min_x <= block.max_x and 
+                            ball.real_position.max_x >= block.max_x) then
+                                ball.direction.x = -ball.direction.x
+                        end
                         break
                 end
             end
