@@ -162,12 +162,17 @@ function move_ball()
                    ball.real_position.max_y >= block.min_y and
                    ball.real_position.max_x >= block.min_x and 
                    ball.real_position.min_x <= block.max_x then
-                        ball.direction.y = -ball.direction.y
-                        if ball.direction.y < 0.1 then
+                   local overlapped_x = min(ball.real_position.max_x - block.min_x, 
+                                            block.max_x - ball.real_position.min_x)
+                   local overlapped_y = min(ball.real_position.max_y - block.min_y, 
+                                            block.max_y - ball.real_position.min_y)
+                   if overlapped_x < overlapped_y then
                             ball.direction.x = -ball.direction.x
-                        end
+                   else
+                            ball.direction.y = -ball.direction.y
+                   end
                         block.alive = false
-                        break
+                   break
                 end
             end
         end
@@ -280,8 +285,6 @@ function collide_with_paddles()
                                           paddle_left_top.x_offset + 1
         end
 
-        -- TODO: lets wrap this up in a bool to check if it's collided with anything first
-        --
         if has_collided then
             local ball_direction_magnitude = sqrt(new_direction_x*new_direction_x + 
                                                   new_direction_y*new_direction_y)
