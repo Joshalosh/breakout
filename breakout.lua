@@ -149,6 +149,7 @@ function move_ball()
         ball.real_position.min_y = ball.sprite_position.y + ball.y_offset
         ball.real_position.max_y = ball.real_position.min_y + 1
 
+        -- This commented out section is needed if I want to have the ball rebound off the walls
         --[[
         if ball.real_position.min_y <= 0 or ball.real_position.max_y >= 128 then 
            ball.direction.y = -ball.direction.y
@@ -189,6 +190,7 @@ function move_ball()
             end
         end
 
+        -- This clamp is needed if I want the ball to rebound off the walls
         --[[
         ball.sprite_position.y = mid(0 - ball.y_offset, ball.sprite_position.y, 128 + ball.y_offset)
         ball.sprite_position.x = mid(0 - ball.x_offset, ball.sprite_position.x, 128 + ball.x_offset)
