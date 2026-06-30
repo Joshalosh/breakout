@@ -149,11 +149,23 @@ function move_ball()
         ball.real_position.min_y = ball.sprite_position.y + ball.y_offset
         ball.real_position.max_y = ball.real_position.min_y + 1
 
+        --[[
         if ball.real_position.min_y <= 0 or ball.real_position.max_y >= 128 then 
            ball.direction.y = -ball.direction.y
         end
         if ball.real_position.min_x <= 0 or ball.real_position.max_x >= 128 then 
             ball.direction.x = -ball.direction.x
+        end
+        --]]
+        if ball.real_position.max_y < 0 then
+            ball.sprite_position.y = 128 - ball.y_offset
+        elseif ball.real_position.min_y > 128 then
+            ball.sprite_position.y = 0 - (ball.y_offset)
+        end
+        if ball.real_position.max_x < 0 then
+            ball.sprite_position.x = 128 - ball.x_offset
+        elseif ball.real_position.min_x > 128 then
+            ball.sprite_position.x = 0 - (ball.x_offset)
         end
 
         for block in all(active_blocks) do
@@ -177,8 +189,10 @@ function move_ball()
             end
         end
 
+        --[[
         ball.sprite_position.y = mid(0 - ball.y_offset, ball.sprite_position.y, 128 + ball.y_offset)
         ball.sprite_position.x = mid(0 - ball.x_offset, ball.sprite_position.x, 128 + ball.x_offset)
+        --]]
     end
 end
 
@@ -345,5 +359,5 @@ function _draw()
     pset(0,127,12)
     pset(ball.sprite_position.x, ball.sprite_position.y, 12)
     pset(ball.real_position.min_x, ball.real_position.min_y, 3)
-    pset(ball.real_position.max_x, ball.real_position.max_y, 6)
+    pset(ball.real_position.max_x, ball.real_position.max_y, 3)
 end
