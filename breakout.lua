@@ -199,6 +199,7 @@ function move_ball()
 end
 
 
+--[[
 function collide_with_paddles()
     if ball.is_launched then
         -- TODO: get AABB collision working with paddles 
@@ -309,7 +310,132 @@ function collide_with_paddles()
         end
     end
 end
+--]]
 
+function collide_with_paddles()
+    if not ball.is_launched then return end
+
+    local ball_pos_min_y  = ball.real_position.min_y 
+    local ball_pos_min_x  = ball.real_position.min_x 
+    local ball_pos_max_y  = ball.real_position.max_y 
+    local ball_pos_max_x  = ball.real_position.max_x 
+    
+    -- 1. USE TRUE CENTER FOR SYMMETRICAL STEERING
+    local ball_center_x   = ball_pos_min_x + 0.5
+    local ball_center_y   = ball_pos_min_y + 0.5
+    
+    local new_direction_x = ball.direction.x
+    local new_direction_y = ball.direction.y
+    local has_collided    = false
+
+    -- BOTTOM PADDLE
+    if not has_collided and 
+       ball_pos_max_y >= paddle_bot.sprite_position.y and
+       ball_pos_min_y <= (paddle_bot.sprite_position.y + paddle_bot.height) and 
+       ball_pos_max_x >= paddle_bot.sprite_position.x and 
+       ball_pos_min_x <= (paddle_bot.sprite_position.x + paddle_bot.width) then
+           
+           local half_size         = paddle_bot.width * 0.5
+           local distance_from_mid = ball_center_x - (paddle_bot.sprite_position.x + half_size)
+           new_direction_x         = (distance_from_mid / half_size)
+           new_direction_y         = -1.0 -- 2. HARDCODE OUTWARD PUSH
+           has_collided            = true
+
+           -- 3. THE PHANTOM RESET FIX (Update sprite_position)
+           ball.sprite_position.y = (paddle_bot.sprite_position.y - 1) - ball.y_offset - 1
+    end
+
+    -- TOP PADDLE
+    if not has_collided and 
+       ball_pos_max_y >= (paddle_top.sprite_position.y + paddle_top.y_offset) and
+       ball_pos_min_y <= (paddle_top.sprite_position.y + paddle_top.y_offset + paddle_top.height) and 
+       ball_pos_max_x >= paddle_top.sprite_position.x and 
+       ball_pos_min_x <= (paddle_top.sprite_position.x + paddle_top.width) then
+
+           local half_size         = paddle_top.width * 0.5
+           local distance_from_mid = ball_center_x - (paddle_top.sprite_position.x + half_size)
+           new_direction_x         = (distance_from_mid / half_size)
+           new_direction_y         = 1.0 
+           has_collided            = true
+
+           local target_y = paddle_top.sprite_position.y + paddle_top.height + paddle_top.y_offset + 1
+           ball.sprite_position.y = target_y - ball.y_offset
+    end
+
+    -- RIGHT BOTTOM PADDLE
+    if not has_collided and 
+       ball_pos_max_y >= paddle_right_bot.sprite_position.y and
+       ball_pos_min_y <= (paddle_right_bot.sprite_position.y + paddle_right_bot.height) and 
+       ball_pos_max_x >= paddle_right_bot.sprite_position.x and 
+       ball_pos_min_x <= (paddle_right_bot.sprite_position.x + paddle_right_bot.width) then
+
+           local half_size         = paddle_right_bot.height * 0.5
+           local distance_from_mid = ball_center_y - (paddle_right_bot.sprite_position.y + half_size)
+           new_direction_y         = distance_from_mid / half_size
+           new_direction_x         = -1.0
+           has_collided            = true
+
+           ball.sprite_position.x = (paddle_right_bot.sprite_position.x - 1) - ball.x_offset - 1
+    end
+
+    -- LEFT BOTTOM PADDLE
+    if not has_collided and 
+       ball_pos_max_y >= paddle_left_bot.sprite_position.y and 
+       ball_pos_min_y <= (paddle_left_bot.sprite_position.y + paddle_left_bot.height) and 
+       ball_pos_max_x >= (paddle_left_bot.sprite_position.x + paddle_left_bot.x_offset) and 
+       ball_pos_min_x <= (paddle_left_bot.sprite_position.x + paddle_left_bot.x_offset + paddle_left_bot.width) then
+
+           local half_size         = paddle_left_bot.height * 0.5
+           local distance_from_mid = ball_center_y - (paddle_left_bot.sprite_position.y + half_size)
+           new_direction_y         = distance_from_mid / half_size
+           new_direction_x         = 1.0
+           has_collided            = true
+
+           local target_x = paddle_left_bot.sprite_position.x + paddle_left_bot.width + paddle_left_bot.x_offset + 1
+           ball.sprite_position.x = target_x - ball.x_offset
+    end
+
+    -- RIGHT TOP PADDLE
+    if not has_collided and 
+       ball_pos_max_y >= paddle_right_top.sprite_position.y and
+       ball_pos_min_y <= (paddle_right_top.sprite_position.y + paddle_right_top.height) and 
+       ball_pos_max_x >= paddle_right_top.sprite_position.x and 
+       ball_pos_min_x <= (paddle_right_top.sprite_position.x + paddle_right_top.width) then
+
+           local half_size         = paddle_right_top.height * 0.5
+           local distance_from_mid = ball_center_y - (paddle_right_top.sprite_position.y + half_size)
+           new_direction_y         = distance_from_mid / half_size
+           new_direction_x         = -1.0
+           has_collided            = true
+
+           ball.sprite_position.x = (paddle_right_top.sprite_position.x - 1) - ball.x_offset - 1
+    end
+
+    -- LEFT TOP PADDLE
+    if not has_collided and 
+       ball_pos_max_y >= paddle_left_top.sprite_position.y and 
+       ball_pos_min_y <= (paddle_left_top.sprite_position.y + paddle_left_top.height) and 
+       ball_pos_max_x >= (paddle_left_top.sprite_position.x + paddle_left_top.x_offset) and 
+       ball_pos_min_x <= (paddle_left_top.sprite_position.x + paddle_left_top.x_offset + paddle_left_top.width) then
+
+           local half_size         = paddle_left_top.height * 0.5
+           local distance_from_mid = ball_center_y - (paddle_left_top.sprite_position.y + half_size)
+           new_direction_y         = distance_from_mid / half_size
+           new_direction_x         = 1.0
+           has_collided            = true
+
+           local target_x = paddle_left_top.sprite_position.x + paddle_left_top.width + paddle_left_top.x_offset + 1
+           ball.sprite_position.x = target_x - ball.x_offset
+    end
+
+    -- Normalize
+    if has_collided then
+        local ball_direction_magnitude = sqrt(new_direction_x*new_direction_x + 
+                                              new_direction_y*new_direction_y)
+        ball.direction.x = new_direction_x / ball_direction_magnitude
+        ball.direction.y = new_direction_y / ball_direction_magnitude
+    end
+end
 function move_paddles()
     local min_pos      = 8
     local half_pos = tile_size * (grid_size*0.5)
