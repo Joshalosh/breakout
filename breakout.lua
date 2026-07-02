@@ -175,16 +175,35 @@ function move_ball()
                    ball.real_position.max_y >= block.min_y and
                    ball.real_position.max_x >= block.min_x and 
                    ball.real_position.min_x <= block.max_x then
-                   local overlapped_x = min(ball.real_position.max_x - block.min_x, 
-                                            block.max_x - ball.real_position.min_x)
-                   local overlapped_y = min(ball.real_position.max_y - block.min_y, 
-                                            block.max_y - ball.real_position.min_y)
-                   if overlapped_x < overlapped_y then
-                            ball.direction.x = -ball.direction.x
-                   else
-                            ball.direction.y = -ball.direction.y
+                   --
+                   -- We have a collision! 
+                   -- Look at where the ball was on the PREVIOUS frame:
+                   local prev_min_x = ball.real_position.min_x - (ball.direction.x * ball.speed)
+                   local prev_max_x = ball.real_position.max_x - (ball.direction.x * ball.speed)
+                   local prev_min_y = ball.real_position.min_y - (ball.direction.y * ball.speed)
+                   local prev_max_y = ball.real_position.max_y - (ball.direction.y * ball.speed)
+                    
+                   local hit_vertical = false
+                   local hit_horizontal = false
+
+                   -- If it was outside the block vertically last frame, it hit the top/bottom
+                   if prev_max_y <= block.min_y or prev_min_y >= block.max_y then
+                        ball.direction.y = -ball.direction.y
+                        hit_vertical = true
                    end
-                        block.alive = false
+                    
+                   -- If it was outside the block horizontally last frame, it hit the left/right
+                   if prev_max_x <= block.min_x or prev_min_x >= block.max_x then
+                        ball.direction.x = -ball.direction.x
+                        hit_horizontal = true
+                   end
+                    
+                   -- Failsafe: if a block spawned on top of the ball, just force a bounce
+                   if not hit_vertical and not hit_horizontal then
+                        ball.direction.y = -ball.direction.y
+                   end
+
+                   block.alive = false
                    break
                 end
             end
@@ -312,6 +331,8 @@ function collide_with_paddles()
 end
 --]]
 
+
+--[[
 function collide_with_paddles()
     if not ball.is_launched then return end
 
@@ -338,11 +359,17 @@ function collide_with_paddles()
            local half_size         = paddle_bot.width * 0.5
            local distance_from_mid = ball_center_x - (paddle_bot.sprite_position.x + half_size)
            new_direction_x         = (distance_from_mid / half_size)
-           new_direction_y         = -1.0 -- 2. HARDCODE OUTWARD PUSH
+           new_direction_y         = -new_direction_y -- -1.0 -- 2. HARDCODE OUTWARD PUSH
            has_collided            = true
 
            -- 3. THE PHANTOM RESET FIX (Update sprite_position)
-           ball.sprite_position.y = (paddle_bot.sprite_position.y - 1) - ball.y_offset - 1
+           local hit_top = ball.real_position.max_y - paddle_bot.sprite_position.y
+           local hit_bottom = (paddle_bot.sprite_position.y + 1) - ball.real_position.min_y
+           if hit_top < hit_bottom then 
+               ball.sprite_position.y = (paddle_bot.sprite_position.y - 1) - ball.y_offset - 1
+           else
+               ball.sprite_position.y = (paddle_bot.sprite_position.y + 2) + ball.y_offset + 1
+           end
     end
 
     -- TOP PADDLE
@@ -426,6 +453,199 @@ function collide_with_paddles()
 
            local target_x = paddle_left_top.sprite_position.x + paddle_left_top.width + paddle_left_top.x_offset + 1
            ball.sprite_position.x = target_x - ball.x_offset
+    end
+
+    -- Normalize
+    if has_collided then
+        local ball_direction_magnitude = sqrt(new_direction_x*new_direction_x + 
+                                              new_direction_y*new_direction_y)
+        ball.direction.x = new_direction_x / ball_direction_magnitude
+        ball.direction.y = new_direction_y / ball_direction_magnitude
+    end
+end
+--]]
+function collide_with_paddles()
+    if not ball.is_launched then return end
+
+    local ball_pos_min_y  = ball.real_position.min_y 
+    local ball_pos_min_x  = ball.real_position.min_x 
+    local ball_pos_max_y  = ball.real_position.max_y 
+    local ball_pos_max_x  = ball.real_position.max_x 
+    
+    local ball_center_x   = ball_pos_min_x + 0.5
+    local ball_center_y   = ball_pos_min_y + 0.5
+    
+    local new_direction_x = ball.direction.x
+    local new_direction_y = ball.direction.y
+    local has_collided    = false
+
+    -- =====================================
+    -- BOTTOM PADDLE (Horizontal)
+    -- =====================================
+    local p_bot_min_y = paddle_bot.sprite_position.y
+    local p_bot_max_y = p_bot_min_y + paddle_bot.height
+    local p_bot_min_x = paddle_bot.sprite_position.x
+    local p_bot_max_x = p_bot_min_x + paddle_bot.width
+
+    if not has_collided and 
+       ball_pos_max_y >= p_bot_min_y and ball_pos_min_y <= p_bot_max_y and 
+       ball_pos_max_x >= p_bot_min_x and ball_pos_min_x <= p_bot_max_x then
+           
+           local half_size = paddle_bot.width * 0.5
+           new_direction_x = (ball_center_x - (p_bot_min_x + half_size)) / half_size
+           
+           -- Check front/back overlap
+           local overlap_top = ball_pos_max_y - p_bot_min_y
+           local overlap_bottom = p_bot_max_y - ball_pos_min_y
+           
+           if overlap_top < overlap_bottom then
+               new_direction_y = -1.0 -- Hit top face, bounce up
+               ball.sprite_position.y = p_bot_min_y - ball.y_offset - 2
+           else
+               new_direction_y = 1.0  -- Hit bottom face, bounce down
+               ball.sprite_position.y = p_bot_max_y - ball.y_offset + 1
+           end
+           has_collided = true
+    end
+
+    -- =====================================
+    -- TOP PADDLE (Horizontal)
+    -- =====================================
+    local p_top_min_y = paddle_top.sprite_position.y + paddle_top.y_offset
+    local p_top_max_y = p_top_min_y + paddle_top.height
+    local p_top_min_x = paddle_top.sprite_position.x
+    local p_top_max_x = p_top_min_x + paddle_top.width
+
+    if not has_collided and 
+       ball_pos_max_y >= p_top_min_y and ball_pos_min_y <= p_top_max_y and 
+       ball_pos_max_x >= p_top_min_x and ball_pos_min_x <= p_top_max_x then
+
+           local half_size = paddle_top.width * 0.5
+           new_direction_x = (ball_center_x - (p_top_min_x + half_size)) / half_size
+           
+           local overlap_top = ball_pos_max_y - p_top_min_y
+           local overlap_bottom = p_top_max_y - ball_pos_min_y
+
+           if overlap_bottom < overlap_top then
+               new_direction_y = 1.0 -- Hit bottom face, bounce down
+               ball.sprite_position.y = p_top_max_y - ball.y_offset + 1
+           else
+               new_direction_y = -1.0 -- Hit top face, bounce up
+               ball.sprite_position.y = p_top_min_y - ball.y_offset - 2
+           end
+           has_collided = true
+    end
+
+    -- =====================================
+    -- RIGHT BOTTOM PADDLE (Vertical)
+    -- =====================================
+    local prb_min_y = paddle_right_bot.sprite_position.y
+    local prb_max_y = prb_min_y + paddle_right_bot.height
+    local prb_min_x = paddle_right_bot.sprite_position.x
+    local prb_max_x = prb_min_x + paddle_right_bot.width
+
+    if not has_collided and 
+       ball_pos_max_y >= prb_min_y and ball_pos_min_y <= prb_max_y and 
+       ball_pos_max_x >= prb_min_x and ball_pos_min_x <= prb_max_x then
+
+           local half_size = paddle_right_bot.height * 0.5
+           new_direction_y = (ball_center_y - (prb_min_y + half_size)) / half_size
+           
+           local overlap_left = ball_pos_max_x - prb_min_x
+           local overlap_right = prb_max_x - ball_pos_min_x
+
+           if overlap_left < overlap_right then
+               new_direction_x = -1.0 -- Hit left face, bounce left
+               ball.sprite_position.x = prb_min_x - ball.x_offset - 2
+           else
+               new_direction_x = 1.0 -- Hit right face, bounce right
+               ball.sprite_position.x = prb_max_x - ball.x_offset + 1
+           end
+           has_collided = true
+    end
+
+    -- =====================================
+    -- LEFT BOTTOM PADDLE (Vertical)
+    -- =====================================
+    local plb_min_y = paddle_left_bot.sprite_position.y
+    local plb_max_y = plb_min_y + paddle_left_bot.height
+    local plb_min_x = paddle_left_bot.sprite_position.x + paddle_left_bot.x_offset
+    local plb_max_x = plb_min_x + paddle_left_bot.width
+
+    if not has_collided and 
+       ball_pos_max_y >= plb_min_y and ball_pos_min_y <= plb_max_y and 
+       ball_pos_max_x >= plb_min_x and ball_pos_min_x <= plb_max_x then
+
+           local half_size = paddle_left_bot.height * 0.5
+           new_direction_y = (ball_center_y - (plb_min_y + half_size)) / half_size
+           
+           local overlap_left = ball_pos_max_x - plb_min_x
+           local overlap_right = plb_max_x - ball_pos_min_x
+
+           if overlap_right < overlap_left then
+               new_direction_x = 1.0 -- Hit right face, bounce right
+               ball.sprite_position.x = plb_max_x - ball.x_offset + 1
+           else
+               new_direction_x = -1.0 -- Hit left face, bounce left
+               ball.sprite_position.x = plb_min_x - ball.x_offset - 2
+           end
+           has_collided = true
+    end
+
+    -- =====================================
+    -- RIGHT TOP PADDLE (Vertical)
+    -- =====================================
+    local prt_min_y = paddle_right_top.sprite_position.y
+    local prt_max_y = prt_min_y + paddle_right_top.height
+    local prt_min_x = paddle_right_top.sprite_position.x
+    local prt_max_x = prt_min_x + paddle_right_top.width
+
+    if not has_collided and 
+       ball_pos_max_y >= prt_min_y and ball_pos_min_y <= prt_max_y and 
+       ball_pos_max_x >= prt_min_x and ball_pos_min_x <= prt_max_x then
+
+           local half_size = paddle_right_top.height * 0.5
+           new_direction_y = (ball_center_y - (prt_min_y + half_size)) / half_size
+           
+           local overlap_left = ball_pos_max_x - prt_min_x
+           local overlap_right = prt_max_x - ball_pos_min_x
+
+           if overlap_left < overlap_right then
+               new_direction_x = -1.0 -- Hit left face, bounce left
+               ball.sprite_position.x = prt_min_x - ball.x_offset - 2
+           else
+               new_direction_x = 1.0 -- Hit right face, bounce right
+               ball.sprite_position.x = prt_max_x - ball.x_offset + 1
+           end
+           has_collided = true
+    end
+
+    -- =====================================
+    -- LEFT TOP PADDLE (Vertical)
+    -- =====================================
+    local plt_min_y = paddle_left_top.sprite_position.y
+    local plt_max_y = plt_min_y + paddle_left_top.height
+    local plt_min_x = paddle_left_top.sprite_position.x + paddle_left_top.x_offset
+    local plt_max_x = plt_min_x + paddle_left_top.width
+
+    if not has_collided and 
+       ball_pos_max_y >= plt_min_y and ball_pos_min_y <= plt_max_y and 
+       ball_pos_max_x >= plt_min_x and ball_pos_min_x <= plt_max_x then
+
+           local half_size = paddle_left_top.height * 0.5
+           new_direction_y = (ball_center_y - (plt_min_y + half_size)) / half_size
+           
+           local overlap_left = ball_pos_max_x - plt_min_x
+           local overlap_right = plt_max_x - ball_pos_min_x
+
+           if overlap_right < overlap_left then
+               new_direction_x = 1.0 -- Hit right face, bounce right
+               ball.sprite_position.x = plt_max_x - ball.x_offset + 1
+           else
+               new_direction_x = -1.0 -- Hit left face, bounce left
+               ball.sprite_position.x = plt_min_x - ball.x_offset - 2
+           end
+           has_collided = true
     end
 
     -- Normalize
