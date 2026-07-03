@@ -97,7 +97,7 @@ function _init()
     load_level(level_data)
 end
 
-function _update()
+function _update60()
     get_button_held()
     move_paddles()
     move_ball()
