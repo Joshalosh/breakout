@@ -362,8 +362,10 @@ function collide_with_paddles()
            new_direction_x = (ball_center_x - (p_bot_min_x + half_size)) / half_size
            
            -- Check front/back overlap
-           local overlap_top = ball_pos_max_y - p_bot_min_y
-           local overlap_bottom = p_bot_max_y - ball_pos_min_y
+           local prev_ball_pos_min_y = ball_pos_min_y - (ball.direction.y * ball.speed) 
+           local prev_ball_pos_max_y = ball_pos_max_y - (ball.direction.y * ball.speed)
+           local overlap_top = prev_ball_pos_max_y - p_bot_min_y
+           local overlap_bottom = p_bot_max_y - prev_ball_pos_min_y
            
            if overlap_top < overlap_bottom then
                new_direction_y = -1.0 -- Hit top face, bounce up
@@ -390,8 +392,10 @@ function collide_with_paddles()
            local half_size = paddle_top.width * 0.5
            new_direction_x = (ball_center_x - (p_top_min_x + half_size)) / half_size
            
-           local overlap_top = ball_pos_max_y - p_top_min_y
-           local overlap_bottom = p_top_max_y - ball_pos_min_y
+           local prev_ball_pos_min_y = ball_pos_min_y - (ball.direction.y * ball.speed)
+           local prev_ball_pos_max_y = ball_pos_max_y - (ball.direction.y * ball.speed)
+           local overlap_top = prev_ball_pos_max_y - p_top_min_y
+           local overlap_bottom = p_top_max_y - prev_ball_pos_min_y
 
            if overlap_bottom < overlap_top then
                new_direction_y = 1.0 -- Hit bottom face, bounce down
@@ -418,8 +422,10 @@ function collide_with_paddles()
            local half_size = paddle_right_bot.height * 0.5
            new_direction_y = (ball_center_y - (prb_min_y + half_size)) / half_size
            
-           local overlap_left = ball_pos_max_x - prb_min_x
-           local overlap_right = prb_max_x - ball_pos_min_x
+           local prev_ball_pos_min_x = ball_pos_min_x - (ball.direction.x * ball.speed)
+           local prev_ball_pos_max_x = ball_pos_max_x - (ball.direction.x * ball.speed)
+           local overlap_left = prev_ball_pos_max_x - prb_min_x
+           local overlap_right = prb_max_x - prev_ball_pos_min_x
 
            if overlap_left < overlap_right then
                new_direction_x = -1.0 -- Hit left face, bounce left
@@ -446,8 +452,10 @@ function collide_with_paddles()
            local half_size = paddle_left_bot.height * 0.5
            new_direction_y = (ball_center_y - (plb_min_y + half_size)) / half_size
            
-           local overlap_left = ball_pos_max_x - plb_min_x
-           local overlap_right = plb_max_x - ball_pos_min_x
+           local prev_ball_pos_min_x = ball_pos_min_x - (ball.direction.x * ball.speed)
+           local prev_ball_pos_max_x = ball_pos_max_x - (ball.direction.x * ball.speed)
+           local overlap_left = prev_ball_pos_max_x - plb_min_x
+           local overlap_right = plb_max_x - prev_ball_pos_min_x
 
            if overlap_right < overlap_left then
                new_direction_x = 1.0 -- Hit right face, bounce right
@@ -474,8 +482,10 @@ function collide_with_paddles()
            local half_size = paddle_right_top.height * 0.5
            new_direction_y = (ball_center_y - (prt_min_y + half_size)) / half_size
            
-           local overlap_left = ball_pos_max_x - prt_min_x
-           local overlap_right = prt_max_x - ball_pos_min_x
+           local prev_ball_pos_min_x = ball_pos_min_x - (ball.direction.x * ball.speed)
+           local prev_ball_pos_max_x = ball_pos_max_x - (ball.direction.x * ball.speed)
+           local overlap_left = prev_ball_pos_max_x - prt_min_x
+           local overlap_right = prt_max_x - prev_ball_pos_min_x
 
            if overlap_left < overlap_right then
                new_direction_x = -1.0 -- Hit left face, bounce left
@@ -502,8 +512,10 @@ function collide_with_paddles()
            local half_size = paddle_left_top.height * 0.5
            new_direction_y = (ball_center_y - (plt_min_y + half_size)) / half_size
            
-           local overlap_left = ball_pos_max_x - plt_min_x
-           local overlap_right = plt_max_x - ball_pos_min_x
+           local prev_ball_pos_min_x = ball_pos_min_x - (ball.direction.x * ball.speed)
+           local prev_ball_pos_max_x = ball_pos_max_x - (ball.direction.x * ball.speed)
+           local overlap_left = prev_ball_pos_max_x - plt_min_x
+           local overlap_right = plt_max_x - prev_ball_pos_min_x
 
            if overlap_right < overlap_left then
                new_direction_x = 1.0 -- Hit right face, bounce right
