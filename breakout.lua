@@ -474,4 +474,9 @@ function _draw()
     pset(ball.sprite_position.x, ball.sprite_position.y, 12)
     pset(ball.real_position.min_x, ball.real_position.min_y, 3)
     pset(ball.real_position.max_x, ball.real_position.max_y, 3)
+    line(ball.real_position.min_x + 0.5, ball.real_position.min_y + 0.5, 
+        (ball.real_position.min_x + 0.5) + ball.direction.x*5, 
+        (ball.real_position.min_y + 0.5) + ball.direction.y*5, 8)
+    print('hello', 12)
+    --print('hello\njoe', 64, 64, 12)
 end
