@@ -95,6 +95,7 @@ function _init()
     }
 
     load_level(level_data)
+    block_count = #active_blocks
 end
 
 function _update()
@@ -204,6 +205,7 @@ function move_ball()
                    end
 
                    block.alive = false
+                   block_count -= 1
                    break
                 end
             end
@@ -214,6 +216,16 @@ function move_ball()
         ball.sprite_position.y = mid(0 - ball.y_offset, ball.sprite_position.y, 128 + ball.y_offset)
         ball.sprite_position.x = mid(0 - ball.x_offset, ball.sprite_position.x, 128 + ball.x_offset)
         --]]
+    end
+end
+
+function print_dialogue()
+    if block_count < 2 then
+        print("they're all... gone", 12)
+    elseif block_count < 3 then
+        print('rethink this, we beg you', 12)
+    elseif block_count < 4 then
+        print('please, dont destroy us', 12)
     end
 end
 
@@ -477,6 +489,7 @@ function _draw()
     line(ball.real_position.min_x + 0.5, ball.real_position.min_y + 0.5, 
         (ball.real_position.min_x + 0.5) + ball.direction.x*5, 
         (ball.real_position.min_y + 0.5) + ball.direction.y*5, 8)
-    print('hello', 12)
+    --print('hello', 12)
     --print('hello\njoe', 64, 64, 12)
+    print_dialogue()
 end
