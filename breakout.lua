@@ -220,7 +220,9 @@ function move_ball()
 end
 
 function print_dialogue()
-    if block_count < 2 then
+    if block_count <= 0 then
+        return
+    elseif block_count < 2 then
         print("they're all... gone", 12)
     elseif block_count < 3 then
         print('rethink this, we beg you', 12)
