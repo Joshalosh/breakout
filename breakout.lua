@@ -1,7 +1,5 @@
 
-function load_level(data)
-    local start_x      = 36
-    local start_y      = 48
+function load_level(data, start_x, start_y)
     local block_width  = 8
     local block_height = 4
 
@@ -86,15 +84,38 @@ function _init()
 
     active_blocks = {}
 
-    level_data = {
+    level_data_1 = {
         {1, 1, 1, 1, 1, 1, 1},
         {1, 1, 1, 1, 1, 1, 1},
         {0, 2, 0, 2, 0, 2, 0},
         {1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 1, 1}
+        {1, 1, 1, 1, 1, 1, 1},
     }
 
-    load_level(level_data)
+    level_data_2 = {
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+        {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+        {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    }
+
+    start_x = 36
+    start_y = 48
+    load_level(level_data_1, start_x, start_y)
     block_count = #active_blocks
 end
 
@@ -125,12 +146,14 @@ function get_button_held()
         new_x  = -1 
         new_y  = -1
     end
+    --[[
     if btn(2) then 
         new_y = -1 
     end
     if btn(3) then 
         new_y =  1 
     end
+    --]]
     if btnp(4) or btnp(5) then 
         ball.is_launched = true 
         local new_dir_x = rnd(2) - 1
@@ -204,7 +227,8 @@ function move_ball()
                         ball.direction.y = -ball.direction.y
                    end
 
-                   block.alive = false
+                   del(active_blocks, block)
+                   --block.alive = false
                    block_count -= 1
                    break
                 end
@@ -219,8 +243,14 @@ function move_ball()
     end
 end
 
+function next_level()
+    load_level(level_data_2, 12, 30)
+    block_count = #active_blocks
+end
+
 function print_dialogue()
     if block_count <= 0 then
+        next_level()
         return
     elseif block_count < 2 then
         print("they're all... gone", 12)
