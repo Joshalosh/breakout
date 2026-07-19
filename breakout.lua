@@ -32,34 +32,40 @@ function _init()
         sprite_position    = {x = tile_size*(grid_size*0.5)-4, y = tile_size * (grid_size - 1)},
         width              = 8,
         height             = 2,
+        velocity           = 0,
     }
     paddle_top = {
         sprite_position = {x = tile_size*(grid_size*0.5)-4, y = 0 },
         width           = 8,
         height          = 2,
         y_offset        = 6,
+        velocity        = 0,
     }
     paddle_left_bot = {
         sprite_position = {x = 0, y = 90},--tile_size*(grid_size*0.75)},
         width    = 2,
         height   = 8, 
         x_offset = 6,
+        velocity = 0,
     }
     paddle_right_bot = {
         sprite_position = {x = tile_size * (grid_size - 1), y = 90},--tile_size*(grid_size*0.75)},
         width           = 2,
         height          = 8,
+        velocity        = 0,
     }
     paddle_left_top = {
         sprite_position = {x = 0, y = 30},--tile_size*(grid_size*0.25)-8},
         width    = 2,
         height   = 8, 
         x_offset = 6,
+        velocity = 0,
     }
     paddle_right_top = {
         sprite_position = {x = tile_size * (grid_size - 1), y = 30},--tile_size*(grid_size*0.25)-8},
         width           = 2,
         height          = 8,
+        velocity        = 0,
     }
 
     local x_offset = 3
@@ -163,7 +169,7 @@ function get_button_held()
     end
 end
 
-function move_ball() 
+function move_ball()
     if ball.is_launched then
         ball.sprite_position.x += ball.direction.x * ball.speed
         ball.sprite_position.y += ball.direction.y * ball.speed
@@ -467,17 +473,21 @@ function collide_with_paddles()
 end
 
 function move_paddles()
-    local min_pos      = 8
-    local half_pos = tile_size * (grid_size*0.5)
-    local max_pos      = tile_size * (grid_size - 2)
-    local velocity     = 3.5
+    local min_pos        = 8
+    local half_pos       = tile_size * (grid_size*0.5)
+    local max_pos        = tile_size * (grid_size - 2)
+    local speed          = 1.25
+    local friction       = 0.4
+    local acceleration_x = new_x * speed
 
-    paddle_bot.sprite_position.x       += (new_x * velocity)
-    paddle_top.sprite_position.x       += (new_x * velocity)
-    paddle_left_bot.sprite_position.y  -= (new_y * velocity*0.5)
-    paddle_right_bot.sprite_position.y += (new_y * velocity*0.5)
-    paddle_left_top.sprite_position.y  += (new_y * velocity*0.5)
-    paddle_right_top.sprite_position.y -= (new_y * velocity*0.5)
+    paddle_bot.velocity                += acceleration_x
+    paddle_bot.sprite_position.x       += acceleration_x + paddle_bot.velocity
+    paddle_bot.velocity                *= friction
+    paddle_top.sprite_position.x       += (new_x * speed)
+    paddle_left_bot.sprite_position.y  -= (new_y * speed*0.5)
+    paddle_right_bot.sprite_position.y += (new_y * speed*0.5)
+    paddle_left_top.sprite_position.y  += (new_y * speed*0.5)
+    paddle_right_top.sprite_position.y -= (new_y * speed*0.5)
     paddle_bot.sprite_position.x        = mid(min_pos, paddle_bot.sprite_position.x, max_pos)
     paddle_top.sprite_position.x        = mid(min_pos, paddle_top.sprite_position.x, max_pos)
     paddle_left_bot.sprite_position.y       = mid(half_pos, paddle_left_bot.sprite_position.y, max_pos)
