@@ -477,7 +477,7 @@ function move_paddles()
     local half_pos       = tile_size * (grid_size*0.5)
     local max_pos        = tile_size * (grid_size - 2)
     local speed          = 1.25
-    local friction       = 0.4
+    local friction       = 0.5
     local acceleration_x = new_x * speed
     local acceleration_y = new_y * speed
 
