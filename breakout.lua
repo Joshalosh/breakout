@@ -479,21 +479,38 @@ function move_paddles()
     local speed          = 1.25
     local friction       = 0.4
     local acceleration_x = new_x * speed
+    local acceleration_y = new_y * speed
 
     paddle_bot.velocity                += acceleration_x
     paddle_bot.sprite_position.x       += acceleration_x + paddle_bot.velocity
     paddle_bot.velocity                *= friction
-    paddle_top.sprite_position.x       += (new_x * speed)
-    paddle_left_bot.sprite_position.y  -= (new_y * speed*0.5)
-    paddle_right_bot.sprite_position.y += (new_y * speed*0.5)
-    paddle_left_top.sprite_position.y  += (new_y * speed*0.5)
-    paddle_right_top.sprite_position.y -= (new_y * speed*0.5)
+
+    paddle_top.velocity                += acceleration_x
+    paddle_top.sprite_position.x       += acceleration_x + paddle_top.velocity
+    paddle_top.velocity                *= friction
+
+    paddle_left_bot.velocity           += acceleration_y*0.25
+    paddle_left_bot.sprite_position.y  -= acceleration_y + paddle_left_bot.velocity
+    paddle_left_bot.velocity           *= friction
+
+    paddle_right_bot.velocity          += acceleration_y*0.25
+    paddle_right_bot.sprite_position.y += acceleration_y + paddle_right_bot.velocity
+    paddle_right_bot.velocity          *= friction
+
+    paddle_left_top.velocity           += acceleration_y*0.25
+    paddle_left_top.sprite_position.y  += acceleration_y + paddle_left_top.velocity
+    paddle_left_top.velocity           *= friction
+
+    paddle_right_top.velocity          += acceleration_y*0.25
+    paddle_right_top.sprite_position.y -= acceleration_y + paddle_right_top.velocity
+    paddle_right_top.velocity          *= friction
+
     paddle_bot.sprite_position.x        = mid(min_pos, paddle_bot.sprite_position.x, max_pos)
     paddle_top.sprite_position.x        = mid(min_pos, paddle_top.sprite_position.x, max_pos)
-    paddle_left_bot.sprite_position.y       = mid(half_pos, paddle_left_bot.sprite_position.y, max_pos)
-    paddle_right_bot.sprite_position.y      = mid(half_pos, paddle_right_bot.sprite_position.y, max_pos)
-    paddle_left_top.sprite_position.y       = mid(min_pos, paddle_left_top.sprite_position.y, half_pos-8)
-    paddle_right_top.sprite_position.y      = mid(min_pos, paddle_right_top.sprite_position.y, half_pos-8)
+    paddle_left_bot.sprite_position.y   = mid(half_pos, paddle_left_bot.sprite_position.y, max_pos)
+    paddle_right_bot.sprite_position.y  = mid(half_pos, paddle_right_bot.sprite_position.y, max_pos)
+    paddle_left_top.sprite_position.y   = mid(min_pos, paddle_left_top.sprite_position.y, half_pos-8)
+    paddle_right_top.sprite_position.y  = mid(min_pos, paddle_right_top.sprite_position.y, half_pos-8)
 end
 
 function _draw()
