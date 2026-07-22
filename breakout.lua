@@ -83,6 +83,7 @@ function _init()
         is_launched = false,
         speed = ball_speed,
         direction = {x = 0, y = -ball_speed},
+        sprite = 14,
     }
     
     sprite_pos = {x = 8*8, y = 8*8}
@@ -252,6 +253,7 @@ end
 function next_level()
     load_level(level_data_2, 12, 30)
     block_count = #active_blocks
+    ball.sprite = 16
 end
 
 function print_dialogue()
@@ -537,7 +539,7 @@ function _draw()
             spr(sprite_id, block.min_x, block.min_y)
         end
     end
-    spr(14, ball.sprite_position.x, ball.sprite_position.y)
+    spr(ball.sprite, ball.sprite_position.x, ball.sprite_position.y)
     spr(14, sprite_pos.x, sprite_pos.y)
     --pset(paddle_bot_x+4, paddle_bot_y-8, 7)
     pset(127,127,12)
