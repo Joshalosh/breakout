@@ -83,7 +83,8 @@ function _init()
         is_launched = false,
         speed = ball_speed,
         direction = {x = 0, y = -ball_speed},
-        sprite = 14,
+        sprite = 16,
+        teleported = false,
     }
     
     sprite_pos = {x = 8*8, y = 8*8}
@@ -179,6 +180,8 @@ function move_ball()
         ball.real_position.max_x = ball.real_position.min_x + 1
         ball.real_position.min_y = ball.sprite_position.y + ball.y_offset
         ball.real_position.max_y = ball.real_position.min_y + 1
+        
+        local ball_real_mid = {x = ball.real_position.min_x + 0.5, y = ball.real_position.min_y + 0.5}
 
         -- This commented out section is needed if I want to have the ball rebound off the walls
         --[[
@@ -191,8 +194,10 @@ function move_ball()
         --]]
         if ball.real_position.max_y < 0 then
             ball.sprite_position.y = 128 - ball.y_offset
+            ball.teleported = false
         elseif ball.real_position.min_y > 128 then
             ball.sprite_position.y = 0 - (ball.y_offset)
+            ball.teleported = false
         end
         if ball.real_position.max_x < 0 then
             ball.sprite_position.x = 128 - ball.x_offset
@@ -241,6 +246,20 @@ function move_ball()
                 end
             end
         end
+
+        --[[
+        -- I need to check this within a band rather than just 
+        -- a straight up less than greater than check.
+        if ball.sprite == 16 then 
+            if ball_real_mid.y < (tile_size*grid_size)/3 or 
+               ball_real_mid.y > (tile_size*grid_size) - ((tile_size*grid_size) / 3) then
+               if ball.teleported == false then
+                   ball.sprite_position.x = (tile_size*grid_size) - ball.sprite_position.x
+                   ball.teleported = true
+               end
+           end
+        end
+        --]]
 
         -- This clamp is needed if I want the ball to rebound off the walls
         --[[
@@ -540,16 +559,16 @@ function _draw()
         end
     end
     spr(ball.sprite, ball.sprite_position.x, ball.sprite_position.y)
-    spr(14, sprite_pos.x, sprite_pos.y)
     --pset(paddle_bot_x+4, paddle_bot_y-8, 7)
-    pset(127,127,12)
-    pset(0,127,12)
-    pset(ball.sprite_position.x, ball.sprite_position.y, 12)
-    pset(ball.real_position.min_x, ball.real_position.min_y, 3)
-    pset(ball.real_position.max_x, ball.real_position.max_y, 3)
-    line(ball.real_position.min_x + 0.5, ball.real_position.min_y + 0.5, 
+    --pset(127,127,12)
+    --pset(0,127,12)
+    --pset(ball.sprite_position.x, ball.sprite_position.y, 12)
+    --pset(ball.real_position.min_x, ball.real_position.min_y, 3)
+    --pset(ball.real_position.max_x, ball.real_position.max_y, 3)
+    --[[line(ball.real_position.min_x + 0.5, ball.real_position.min_y + 0.5, 
         (ball.real_position.min_x + 0.5) + ball.direction.x*5, 
         (ball.real_position.min_y + 0.5) + ball.direction.y*5, 8)
+        --]]
     --print('hello', 12)
     --print('hello\njoe', 64, 64, 12)
     print_dialogue()
