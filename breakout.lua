@@ -27,6 +27,9 @@ function _init()
     grid_size      = 16
     pos_x          = 8
     pos_y          = 8
+    max_screen_y   = tile_size*grid_size
+    teleport_zone_max = (max_screen_y / 4) - 10
+    teleport_zone_min = (max_screen_y / 4) - 15
 
     paddle_bot = {
         sprite_position    = {x = tile_size*(grid_size*0.5)-4, y = tile_size * (grid_size - 1)},
@@ -247,19 +250,24 @@ function move_ball()
             end
         end
 
-        --[[
-        -- I need to check this within a band rather than just 
-        -- a straight up less than greater than check.
         if ball.sprite == 16 then 
-            if ball_real_mid.y < (tile_size*grid_size)/3 or 
-               ball_real_mid.y > (tile_size*grid_size) - ((tile_size*grid_size) / 3) then
-               if ball.teleported == false then
-                   ball.sprite_position.x = (tile_size*grid_size) - ball.sprite_position.x
-                   ball.teleported = true
+            if ((ball_real_mid.y < teleport_zone_max) and
+               (ball_real_mid.y > teleport_zone_min)) then
+               if ball.direction.y < 0 and not ball.teleported then
+                      ball.sprite_position.x = (max_screen_y) - ball.sprite_position.x
                end
+               ball.teleported = true
+
+           elseif ((ball_real_mid.y > max_screen_y - teleport_zone_max) and
+               (ball_real_mid.y < max_screen_y - teleport_zone_min)) then
+               if ball.direction.y > 0 and not ball.teleported then
+                      ball.sprite_position.x = (max_screen_y) - ball.sprite_position.x
+               end
+               ball.teleported = true
+           else
+               ball.teleported = false
            end
         end
-        --]]
 
         -- This clamp is needed if I want the ball to rebound off the walls
         --[[
@@ -559,10 +567,14 @@ function _draw()
         end
     end
     spr(ball.sprite, ball.sprite_position.x, ball.sprite_position.y)
+    pset(0, teleport_zone_max, 12)
+    pset(0, teleport_zone_min, 12)
+    pset(0, max_screen_y - teleport_zone_max, 12)
+    pset(0, max_screen_y - teleport_zone_min, 12)
     --pset(paddle_bot_x+4, paddle_bot_y-8, 7)
     --pset(127,127,12)
     --pset(0,127,12)
-    --pset(ball.sprite_position.x, ball.sprite_position.y, 12)
+        --pset(ball.sprite_position.x, ball.sprite_position.y, 12)
     --pset(ball.real_position.min_x, ball.real_position.min_y, 3)
     --pset(ball.real_position.max_x, ball.real_position.max_y, 3)
     --[[line(ball.real_position.min_x + 0.5, ball.real_position.min_y + 0.5, 
