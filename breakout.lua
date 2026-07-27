@@ -28,8 +28,8 @@ function _init()
     pos_x          = 8
     pos_y          = 8
     max_screen_y   = tile_size*grid_size
-    teleport_zone_max = (max_screen_y / 4) - 10
-    teleport_zone_min = (max_screen_y / 4) - 15
+    teleport_zone_max = (max_screen_y / 4) - 7.5
+    teleport_zone_min = (max_screen_y / 4) - 10
 
     paddle_bot = {
         sprite_position    = {x = tile_size*(grid_size*0.5)-4, y = tile_size * (grid_size - 1)},
@@ -86,7 +86,7 @@ function _init()
         is_launched = false,
         speed = ball_speed,
         direction = {x = 0, y = -ball_speed},
-        sprite = 16,
+        sprite = 14,
         teleported = false,
     }
     
@@ -108,7 +108,6 @@ function _init()
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
         {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
@@ -117,7 +116,6 @@ function _init()
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
         {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
