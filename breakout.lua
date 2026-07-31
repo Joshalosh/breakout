@@ -28,7 +28,7 @@ function _init()
     pos_x          = 8
     pos_y          = 8
     max_screen_y   = tile_size*grid_size
-    teleport_zone_max = (max_screen_y / 4) - 7.5
+    --teleport_zone_max = (max_screen_y / 4) - 7.5
     teleport_zone_min = (max_screen_y / 4) - 10
 
     paddle_bot = {
@@ -86,7 +86,7 @@ function _init()
         is_launched = false,
         speed = ball_speed,
         direction = {x = 0, y = -ball_speed},
-        sprite = 14,
+        sprite = 16,
         teleported = false,
     }
     
@@ -249,19 +249,17 @@ function move_ball()
         end
 
         if ball.sprite == 16 then 
-            if ((ball_real_mid.y < teleport_zone_max) and
-               (ball_real_mid.y > teleport_zone_min)) then
+           if (ball_real_mid.y < teleport_zone_min) then
                if ball.direction.y < 0 and not ball.teleported then
-                      ball.sprite_position.x = (max_screen_y) - ball.sprite_position.x
+                   ball.sprite_position.x = (max_screen_y) - ball.sprite_position.x
+                   ball.teleported = true
                end
-               ball.teleported = true
 
-           elseif ((ball_real_mid.y > max_screen_y - teleport_zone_max) and
-               (ball_real_mid.y < max_screen_y - teleport_zone_min)) then
+           elseif (ball_real_mid.y > (max_screen_y - teleport_zone_min)) then
                if ball.direction.y > 0 and not ball.teleported then
-                      ball.sprite_position.x = (max_screen_y) - ball.sprite_position.x
+                       ball.sprite_position.x = (max_screen_y) - ball.sprite_position.x
+                       ball.teleported = true
                end
-               ball.teleported = true
            else
                ball.teleported = false
            end
@@ -565,9 +563,7 @@ function _draw()
         end
     end
     spr(ball.sprite, ball.sprite_position.x, ball.sprite_position.y)
-    pset(0, teleport_zone_max, 12)
     pset(0, teleport_zone_min, 12)
-    pset(0, max_screen_y - teleport_zone_max, 12)
     pset(0, max_screen_y - teleport_zone_min, 12)
     --pset(paddle_bot_x+4, paddle_bot_y-8, 7)
     --pset(127,127,12)
