@@ -29,7 +29,7 @@ function _init()
     pos_y          = 8
     max_screen     = tile_size*grid_size
     --teleport_zone_max = (max_screen / 4) - 7.5
-    teleport_zone_min = (max_screen / 4) - 10
+    teleport_zone_min = (max_screen / 4) - 5
 
     paddle_bot = {
         sprite_position    = {x = tile_size*(grid_size*0.5)-4, y = tile_size * (grid_size - 1)},
@@ -270,14 +270,14 @@ function move_ball()
         if ball.sprite == 17 then 
            if (ball_real_mid.x < teleport_zone_min) then
                if ball.direction.x < 0 and not ball.teleported then
-                   ball.sprite_position.x = (max_screen) - ball.sprite_position.x
+                   ball.sprite_position.x = (max_screen) - teleport_zone_min
                    ball.direction.x = -ball.direction.x
                    ball.teleported = true
                end
 
            elseif (ball_real_mid.x > (max_screen - teleport_zone_min)) then
                if ball.direction.x > 0 and not ball.teleported then
-                       ball.sprite_position.x = (max_screen) - ball.sprite_position.x
+                       ball.sprite_position.x = teleport_zone_min - 4
                        ball.direction.x = -ball.direction.x
                        ball.teleported = true
                end
